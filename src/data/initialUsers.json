@@ -1,0 +1,39 @@
+{
+  "admin": [
+    {
+      "username": "robert",
+      "email": "admin@library.com",
+      "password": "Admin123",
+      "department": "Library",
+      "role": "admin"
+    }
+  ],
+  "librarian": [
+    {
+      "username": "lisa",
+      "email": "library@gmail.com",
+      "password": "Lib123",
+      "department": "Library",
+      "role": "librarian"
+    }
+  ],
+  "student": [],
+  "guest": [
+    {
+      "username": "guest-test",
+      "email": "guest@library.com",
+      "password": "Guest123",
+      "department": "Public",
+      "role": "guest"
+    }
+  ],
+  "faculty": [
+    {
+      "username": "peter",
+      "email": "faculty@library.com",
+      "password": "Faculty123",
+      "department": "Computer Science",
+      "role": "faculty"
+    }
+  ]
+}
