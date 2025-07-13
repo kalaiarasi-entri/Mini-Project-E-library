@@ -34,7 +34,7 @@ function App() {
     localStorage.setItem('usersByRole', JSON.stringify(updatedStorage));
 
     // Debug log
-    console.log('✅ Final usersByRole:', updatedStorage);
+    console.log('Final usersByRole:', updatedStorage);
   }, []);
 
   return <AppRoutes />;

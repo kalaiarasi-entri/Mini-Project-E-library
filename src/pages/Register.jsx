@@ -30,6 +30,7 @@ export default function Register() {
     }
 
     const newUser = {
+      id: crypto.randomUUID(),
       username: name,
       email,
       password,

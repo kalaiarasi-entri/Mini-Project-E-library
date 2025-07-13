@@ -5,8 +5,8 @@ export default function StudentDashboard() {
 
   return (
     <div className="text-white">
-      <h2>Welcome Librarian!</h2>
-      <p>This is your student dashboard.</p>
+      <h2>Welcome</h2>
+      <p>This is your Librarian dashboard.</p>
     </div>
   );
 }

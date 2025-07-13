@@ -28,6 +28,7 @@ console.log(usersByRole);
     }
 
     if (matchedUser) {
+      //register in redux slice
       dispatch(login(matchedUser));
       alert(`Logged in as ${userRole}`);
 

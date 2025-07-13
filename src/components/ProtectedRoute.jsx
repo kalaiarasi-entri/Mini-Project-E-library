@@ -6,12 +6,12 @@ export default function ProtectedRoute({ children, allowedRoles = [] }) {
   const user = useSelector((state) => state.auth.user)
 
   if (!user) {
-    console.warn("🔒 Not logged in - redirecting to login.")
+    console.log(" Not logged in - redirecting to login.")
     return <Navigate to="/" replace />
   }
 
   if (!allowedRoles.includes(user.role)) {
-    console.warn(`🚫 Access denied for role: ${user.role}`)
+    console.log(`Access denied for role: ${user.role}`)
     return <h2 className="text-danger text-center mt-5">Access Denied</h2>
   }
 

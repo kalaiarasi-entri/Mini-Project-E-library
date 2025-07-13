@@ -7,6 +7,7 @@ export default function ManageBooks() {
   const [search, setSearch] = useState('')
   const [sortBy, setSortBy] = useState('title')
   const [formData, setFormData] = useState({
+    bookId: '', 
     title: '',
     type: '',
     description: '',
@@ -91,6 +92,7 @@ export default function ManageBooks() {
     e.preventDefault()
     const book = {
       ...formData,
+      bookId: formData.bookId || crypto.randomUUID(),
       createdAt: formData.createdAt || new Date().toISOString(),
       createdBy: currentUser?.username || 'Unknown'
     }
