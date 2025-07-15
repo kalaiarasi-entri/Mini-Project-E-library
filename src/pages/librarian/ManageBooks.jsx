@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react'
-import { Pencil, Trash2, Plus } from 'lucide-react'
-import 'animate.css'
+import React, { useEffect, useState } from 'react';
+import { Pencil, Trash2, Plus } from 'lucide-react';
+import 'animate.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 export default function ManageBooks() {
-  const [books, setBooks] = useState([])
-  const [search, setSearch] = useState('')
-  const [sortBy, setSortBy] = useState('title')
+  const [books, setBooks] = useState([]);
+  const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState('title');
+  const [filterType, setFilterType] = useState('All');
   const [formData, setFormData] = useState({
-    bookId: '', 
+    bookId: '',
     title: '',
     type: '',
     description: '',
@@ -17,21 +19,22 @@ export default function ManageBooks() {
     fileURL: '',
     createdAt: '',
     createdBy: ''
-  })
-  const [editIndex, setEditIndex] = useState(null)
-  const [showModal, setShowModal] = useState(false)
-  const [showConfirm, setShowConfirm] = useState(false)
-  const [deleteIndex, setDeleteIndex] = useState(null)
+  });
+  const [editIndex, setEditIndex] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [deleteIndex, setDeleteIndex] = useState(null);
 
-  const currentUser = JSON.parse(localStorage.getItem('user'))
+  const currentUser = JSON.parse(localStorage.getItem('user'));
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem('books')) || []
-    setBooks(stored)
-  }, [])
+    const stored = JSON.parse(localStorage.getItem('books')) || [];
+    setBooks(stored);
+  }, []);
 
   const resetForm = () => {
     setFormData({
+      bookId: '',
       title: '',
       type: '',
       description: '',
@@ -41,73 +44,80 @@ export default function ManageBooks() {
       fileURL: '',
       createdAt: '',
       createdBy: ''
-    })
-    setEditIndex(null)
-  }
+    });
+    setEditIndex(null);
+  };
 
-  const openModal = (index = null) => {
-    if (index !== null) {
-      setFormData(books[index])
-      setEditIndex(index)
+  const openModal = (bookId = null) => {
+    if (bookId) {
+      const index = books.findIndex(b => b.bookId === bookId);
+      const book = books[index];
+      setFormData({
+        ...book,
+        file: null
+      });
+      setEditIndex(index);
+    } else {
+      resetForm();
     }
-    setShowModal(true)
-  }
+    setShowModal(true);
+  };
 
   const closeModal = () => {
-    resetForm()
-    setShowModal(false)
-  }
+    resetForm();
+    setShowModal(false);
+  };
 
   const confirmDelete = (index) => {
-    setDeleteIndex(index)
-    setShowConfirm(true)
-  }
+    setDeleteIndex(index);
+    setShowConfirm(true);
+  };
 
   const handleDeleteConfirmed = () => {
-    const updated = books.filter((_, i) => i !== deleteIndex)
-    setBooks(updated)
-    localStorage.setItem('books', JSON.stringify(updated))
-    setShowConfirm(false)
-  }
+    const updated = books.filter((_, i) => i !== deleteIndex);
+    setBooks(updated);
+    localStorage.setItem('books', JSON.stringify(updated));
+    setShowConfirm(false);
+  };
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target
+    const { name, value, files } = e.target;
     if (name === 'file') {
-      const file = files[0]
+      const file = files[0];
       setFormData((prev) => ({
         ...prev,
         file,
         fileName: file.name,
         fileURL: URL.createObjectURL(file)
-      }))
+      }));
     } else {
       setFormData((prev) => ({
         ...prev,
         [name]: value
-      }))
+      }));
     }
-  }
+  };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     const book = {
       ...formData,
       bookId: formData.bookId || crypto.randomUUID(),
       createdAt: formData.createdAt || new Date().toISOString(),
       createdBy: currentUser?.username || 'Unknown'
-    }
+    };
 
-    const updated = [...books]
+    const updated = [...books];
     if (editIndex !== null) {
-      updated[editIndex] = book
+      updated[editIndex] = book;
     } else {
-      updated.push(book)
+      updated.push(book);
     }
 
-    setBooks(updated)
-    localStorage.setItem('books', JSON.stringify(updated))
-    closeModal()
-  }
+    setBooks(updated);
+    localStorage.setItem('books', JSON.stringify(updated));
+    closeModal();
+  };
 
   const filtered = books
     .filter((b) =>
@@ -115,42 +125,74 @@ export default function ManageBooks() {
         field.toLowerCase().includes(search.toLowerCase())
       )
     )
+    .filter((b) => filterType === 'All' || b.type === filterType)
     .sort((a, b) => {
-      if (sortBy === 'createdAt') return new Date(b.createdAt) - new Date(a.createdAt)
-      return a[sortBy].localeCompare(b[sortBy])
-    })
+      if (sortBy === 'createdAt') return new Date(a.createdAt) - new Date(b.createdAt); // newer last
+      return a[sortBy].localeCompare(b[sortBy]);
+    });
 
   return (
     <div className="container mt-4 text-white animate__animated animate__fadeIn">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h3>Manage Books</h3>
         <button className="btn btn-success" onClick={() => openModal()}>
           <Plus className="me-1" size={18} /> Add Book
         </button>
       </div>
 
-      <div className="row mb-4">
-        <div className="col-md-6 mb-2">
-          <input
-            className="form-control"
-            placeholder="Search by title, author, or type"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+      {/* Filters */}
+      <div className="row mb-4 g-3">
+        <div className="col-md-4">
+          <div className="input-group">
+            <span className="input-group-text bg-secondary border-0 text-white">
+              <i className="bi bi-search"></i>
+            </span>
+            <input
+              type="text"
+              className="form-control bg-dark text-white border-secondary"
+              placeholder="Search by title, author, or type"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
         </div>
-        <div className="col-md-6">
-          <select
-            className="form-select"
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-          >
-            <option value="title">Sort by Title</option>
-            <option value="type">Sort by Type</option>
-            <option value="createdAt">Sort by Created Date</option>
-          </select>
+
+        <div className="col-md-4">
+          <div className="input-group">
+            <span className="input-group-text bg-secondary border-0 text-white">
+              <i className="bi bi-arrow-down-up"></i>
+            </span>
+            <select
+              className="form-select bg-dark text-white border-secondary"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <option value="title">Sort by Title</option>
+              <option value="type">Sort by Type</option>
+              <option value="createdAt">Sort by Created Date</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="col-md-4">
+          <div className="input-group">
+            <span className="input-group-text bg-secondary border-0 text-white">
+              <i className="bi bi-filter-circle"></i>
+            </span>
+            <select
+              className="form-select bg-dark text-white border-secondary"
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+            >
+              <option value="All">All Types</option>
+              <option value="Books">Books</option>
+              <option value="Journals">Journals</option>
+              <option value="Research Papers">Research Papers</option>
+            </select>
+          </div>
         </div>
       </div>
 
+      {/* Books Table */}
       <table className="table table-dark table-striped table-bordered table-hover">
         <thead>
           <tr>
@@ -168,11 +210,11 @@ export default function ManageBooks() {
         <tbody>
           {filtered.length === 0 ? (
             <tr>
-              <td colSpan="9" className="text-center text-muted text-white">No records found.</td>
+              <td colSpan="9" className="text-center text-white">No records found</td>
             </tr>
           ) : (
             filtered.map((b, i) => (
-              <tr key={i} className="animate__animated animate__fadeInUp">
+              <tr key={b.bookId} className="animate__animated animate__fadeInUp">
                 <td>{i + 1}</td>
                 <td>{b.title}</td>
                 <td>{b.type}</td>
@@ -180,18 +222,16 @@ export default function ManageBooks() {
                 <td>{b.description}</td>
                 <td>
                   {b.fileURL ? (
-                    <a href={b.fileURL} target="_blank" rel="noreferrer">
-                      {b.fileName || 'View'}
-                    </a>
+                    <a href={b.fileURL} target="_blank" rel="noreferrer">View</a>
                   ) : 'N/A'}
                 </td>
                 <td>{b.createdBy}</td>
                 <td>{new Date(b.createdAt).toLocaleDateString()}</td>
                 <td>
-                  <button className="btn btn-warning btn-sm me-2" onClick={() => openModal(i)}>
+                  <button className="btn btn-primary btn-sm me-2" onClick={() => openModal(b.bookId)}>
                     <Pencil size={16} />
                   </button>
-                  <button className="btn btn-danger btn-sm" onClick={() => confirmDelete(i)}>
+                  <button className="btn btn-danger btn-sm" onClick={() => confirmDelete(books.findIndex(book => book.bookId === b.bookId))}>
                     <Trash2 size={16} />
                   </button>
                 </td>
@@ -201,7 +241,7 @@ export default function ManageBooks() {
         </tbody>
       </table>
 
-      {/* Add/Edit Modal */}
+      {/* Modal for Add/Edit */}
       {showModal && (
         <div className="modal d-block fade show animate__animated animate__zoomIn" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}>
           <div className="modal-dialog modal-lg modal-dialog-centered">
@@ -281,7 +321,7 @@ export default function ManageBooks() {
         </div>
       )}
 
-      {/* Delete Confirmation */}
+      {/* Delete Confirmation Modal */}
       {showConfirm && (
         <div className="modal d-block fade show animate__animated animate__fadeIn" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}>
           <div className="modal-dialog modal-dialog-centered">
@@ -299,5 +339,5 @@ export default function ManageBooks() {
         </div>
       )}
     </div>
-  )
+  );
 }

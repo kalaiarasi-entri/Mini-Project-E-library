@@ -2,7 +2,14 @@
   "admin": [
     {
       "username": "robert",
-      "email": "admin@library.com",
+      "email": "admin@gmail.com",
+      "password": "Admin123",
+      "department": "Library",
+      "role": "admin"
+    },
+    {
+      "username": "admin test",
+      "email": "admin2@gmail.com",
       "password": "Admin123",
       "department": "Library",
       "role": "admin"
@@ -15,13 +22,27 @@
       "password": "Lib123",
       "department": "Library",
       "role": "librarian"
+    },
+    {
+      "username": "librarian two",
+      "email": "library2@gmail.com",
+      "password": "Lib123",
+      "department": "Library",
+      "role": "librarian"
     }
   ],
   "student": [],
   "guest": [
     {
-      "username": "guest-test",
-      "email": "guest@library.com",
+      "username": "guest",
+      "email": "guest@gmail.com",
+      "password": "Guest123",
+      "department": "Public",
+      "role": "guest"
+    },
+    {
+      "username": "guest two",
+      "email": "guest2@gmail.com",
       "password": "Guest123",
       "department": "Public",
       "role": "guest"
@@ -30,7 +51,14 @@
   "faculty": [
     {
       "username": "peter",
-      "email": "faculty@library.com",
+      "email": "faculty@gmail.com",
+      "password": "Faculty123",
+      "department": "Computer Science",
+      "role": "faculty"
+    },
+    {
+      "username": "faculty two",
+      "email": "faculty2@gmail.com",
       "password": "Faculty123",
       "department": "Computer Science",
       "role": "faculty"
