@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { login } from "../redux/slices/authSlice";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "animate.css";
 
 export default function Login() {
@@ -12,10 +14,9 @@ export default function Login() {
 
   const handleLogin = () => {
     const usersByRole = JSON.parse(localStorage.getItem("usersByRole")) || {};
-
     let matchedUser = null;
     let userRole = "";
-console.log(usersByRole);
+
     for (const role in usersByRole) {
       const found = usersByRole[role].find(
         (u) => u.email === email && u.password === password
@@ -28,31 +29,52 @@ console.log(usersByRole);
     }
 
     if (matchedUser) {
-      //register in redux slice
       dispatch(login(matchedUser));
-      alert(`Logged in as ${userRole}`);
+      toast.success(`Logged in as ${userRole}`, {
+        position: "top-left",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        // transition: Bounce,
+      });
 
-      switch (userRole) {
-        case "admin":
-          navigate("/admin-dashboard");
-          break;
-        case "librarian":
-          navigate("/librarian-dashboard");
-          break;
-        case "student":
-          navigate("/student-dashboard");
-          break;
-        case "faculty":
-          navigate("/faculty-dashboard");
-          break;
-        case "guest":
-          navigate("/guest-dashboard");
-          break;
-        default:
-          navigate("/");
-      }
+      setTimeout(() => {
+        switch (userRole) {
+          case "admin":
+            navigate("/admin-dashboard");
+            break;
+          case "librarian":
+            navigate("/librarian-dashboard");
+            break;
+          case "student":
+            navigate("/student-dashboard");
+            break;
+          case "faculty":
+            navigate("/faculty-dashboard");
+            break;
+          case "guest":
+            navigate("/guest-dashboard");
+            break;
+          default:
+            navigate("/");
+        }
+      }, 800);
     } else {
-      alert("Invalid credentials or user not found");
+      toast.error("Invalid credentials or user not found", {
+        position: "top-left",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        // transition: Bounce,
+      });
     }
   };
 
