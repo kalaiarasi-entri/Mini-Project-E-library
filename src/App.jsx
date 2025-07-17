@@ -17,22 +17,32 @@ function App() {
           updatedStorage[role] = [];
         }
 
-        initialUsers[role].forEach((newUser) => {
+        initialUsers[role].forEach((newUser, index) => {
           const exists = updatedStorage[role].some(
             (u) => u.email === newUser.email
           );
           if (!exists) {
+            // Assign a userId if not present
+            const existingCount = updatedStorage[role].length;
+            newUser.userId = `${role[0].toUpperCase()}${existingCount + 1}`;
             updatedStorage[role].push(newUser);
           }
         });
       });
     } else {
-      updatedStorage = initialUsers;
+      // First-time setup: create userId for all users
+      updatedStorage = {};
+      Object.keys(initialUsers).forEach((role) => {
+        updatedStorage[role] = initialUsers[role].map((user, index) => ({
+          ...user,
+          userId: `${role[0].toUpperCase()}${index + 1}`,
+        }));
+      });
     }
 
+    // Store in localStorage
     localStorage.setItem("usersByRole", JSON.stringify(updatedStorage));
-    // Debug log
-    console.log('Final usersByRole:', updatedStorage);
+    console.log("Final usersByRole:", updatedStorage);
   }, []);
 
   return (

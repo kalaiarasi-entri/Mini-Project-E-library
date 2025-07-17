@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { RotateCw, Clock, Search, Filter, CalendarDays } from "lucide-react";
+import {
+  RotateCw,
+  Clock,
+  Search,
+  Filter,
+  CalendarDays,
+} from "lucide-react";
 import "animate.css";
 
 export default function BorrowedBooks() {
   const [requests, setRequests] = useState([]);
   const [books, setBooks] = useState([]);
+  const [usersByRole, setUsersByRole] = useState({});
   const [showReturnModal, setShowReturnModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [search, setSearch] = useState("");
@@ -15,8 +22,13 @@ export default function BorrowedBooks() {
 
   useEffect(() => {
     const allRequests = JSON.parse(localStorage.getItem("borrowRequests")) || [];
-    const studentRequests = allRequests.filter((r) => r.studentId === currentUser?.email);
+
+    const studentRequests = allRequests.filter(
+      (r) => r.studentId === currentUser?.email
+    );
+
     const allBooks = JSON.parse(localStorage.getItem("books")) || [];
+    const allUsers = JSON.parse(localStorage.getItem("usersByRole")) || {};
 
     const filteredRequests = studentRequests.filter((req) =>
       allBooks.find((book) => book.bookId === req.bookId)
@@ -24,7 +36,32 @@ export default function BorrowedBooks() {
 
     setRequests(filteredRequests);
     setBooks(allBooks);
+    setUsersByRole(allUsers);
   }, []);
+
+  const getBook = (bookId) => books.find((b) => b.bookId === bookId);
+  const getBookTitle = (bookId) => getBook(bookId)?.title || "Unknown";
+
+  const getLibrarianName = (userId) => {
+    const librarians = usersByRole?.librarian || [];
+    const found = librarians.find((lib) => lib.userId === userId);
+    return found ? found.username : "-";
+  };
+
+  const getStatusBadge = (status) => {
+    const badgeClass =
+      {
+        Requested: "bg-warning text-dark",
+        Borrowed: "bg-success",
+        Returned: "bg-secondary",
+      }[status] || "bg-light text-dark";
+    return <span className={`badge ${badgeClass}`}>{status}</span>;
+  };
+
+  const formatDate = (date) => {
+    if (!date) return "-";
+    return new Date(date).toLocaleDateString();
+  };
 
   const openReturnModal = (req) => {
     setSelectedRequest(req);
@@ -60,24 +97,6 @@ export default function BorrowedBooks() {
     setShowReturnModal(false);
   };
 
-  const getBook = (bookId) => books.find((b) => b.bookId === bookId);
-  const getBookTitle = (bookId) => getBook(bookId)?.title || "Unknown";
-
-  const getStatusBadge = (status) => {
-    const badgeClass =
-      {
-        Requested: "bg-warning text-dark",
-        Borrowed: "bg-success",
-        Returned: "bg-secondary",
-      }[status] || "bg-light text-dark";
-    return <span className={`badge ${badgeClass}`}>{status}</span>;
-  };
-
-  const formatDate = (date) => {
-    if (!date) return "-";
-    return new Date(date).toLocaleDateString();
-  };
-
   const filtered = requests
     .filter((r) => {
       const bookTitle = getBookTitle(r.bookId).toLowerCase();
@@ -101,7 +120,7 @@ export default function BorrowedBooks() {
 
   return (
     <div className="container mt-4 text-white animate__animated animate__fadeIn">
-      {/* Search, Sort, Filter Controls */}
+      {/* Filters */}
       <div className="row mb-4 g-3">
         <div className="col-md-4">
           <label className="form-label text-white d-flex gap-2 align-items-center">
@@ -163,6 +182,7 @@ export default function BorrowedBooks() {
               <th>Book Title</th>
               <th>Requested</th>
               <th>Approved</th>
+              <th>Approved By</th>
               <th>Returned</th>
               <th>Status</th>
               <th>Actions</th>
@@ -171,7 +191,7 @@ export default function BorrowedBooks() {
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan="7" className="text-center text-white">
+                <td colSpan="8" className="text-center text-white">
                   No matching records found.
                 </td>
               </tr>
@@ -184,6 +204,7 @@ export default function BorrowedBooks() {
                     <td>{book?.title || <em className="text-danger">Deleted</em>}</td>
                     <td>{formatDate(req.requestDate)}</td>
                     <td>{formatDate(req.approvedDate)}</td>
+                    <td>{getLibrarianName(req.approvedBy)}</td>
                     <td>{formatDate(req.returnDate)}</td>
                     <td>{getStatusBadge(req.status)}</td>
                     <td className="d-flex gap-2">
@@ -214,7 +235,7 @@ export default function BorrowedBooks() {
         </table>
       </div>
 
-      {/* Return Confirmation Modal */}
+      {/* Return Modal */}
       {showReturnModal && (
         <div
           className="modal d-block fade show animate__animated animate__fadeIn"

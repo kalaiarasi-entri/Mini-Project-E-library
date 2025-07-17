@@ -104,7 +104,8 @@ export default function ManageBooks() {
       ...formData,
       bookId: formData.bookId || crypto.randomUUID(),
       createdAt: formData.createdAt || new Date().toISOString(),
-      createdBy: currentUser?.username || 'Unknown'
+      createdBy: currentUser?.username || 'Unknown',
+      userId: currentUser?.userId
     };
 
     const updated = [...books];

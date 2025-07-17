@@ -6,6 +6,8 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import Layout from "../components/Layout";
 
 import AdminDashboard from "../pages/dashboards/AdminDashboard";
+import ManageUsers from "../pages/admin/ManageUsers";
+import AdminReports from "../pages/admin/AdminReports";
 import LibrarianDashboard from "../pages/dashboards/LibrarianDashboard";
 import StudentDashboard from "../pages/dashboards/StudentDashboard";
 import GuestDashboard from "../pages/dashboards/GuestDashboard";
@@ -14,7 +16,6 @@ import ManageBooks from "../pages/librarian/ManageBooks";
 import MyBooks from "../pages/student/MyBooks";
 import BorrowedBooks from "../pages/student/BorrowedBook";
 import LibrarianBorrowRequests from "../pages/librarian/LibrarianBorrowRequests";
-
 
 export default function AppRoutes() {
   return (
@@ -30,6 +31,22 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <ManageUsers  />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin-reports"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminReports  />
             </ProtectedRoute>
           }
         />

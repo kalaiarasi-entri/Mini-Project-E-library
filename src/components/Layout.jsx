@@ -115,7 +115,7 @@ export default function Layout() {
       label: "Manage Users",
     },
     role === "admin" && {
-      path: "/reports",
+      path: "/admin-reports",
       icon: <FileText size={18} />,
       label: "Reports",
     },

@@ -11,6 +11,8 @@ export default function LibrarianBorrowRequests() {
   const [sortBy, setSortBy] = useState("book");
   const [filterStatus, setFilterStatus] = useState("all");
   const [search, setSearch] = useState("");
+  const [currentUser, setCurrentUser] = useState(null);
+
 
   const formatDate = (isoDate) => {
     if (!isoDate) return "-";
@@ -26,7 +28,8 @@ export default function LibrarianBorrowRequests() {
       JSON.parse(localStorage.getItem("borrowRequests")) || [];
     const allBooks = JSON.parse(localStorage.getItem("books")) || [];
     const userRoles = JSON.parse(localStorage.getItem("usersByRole")) || {};
-
+    const loggedIn = JSON.parse(localStorage.getItem("user"));
+    setCurrentUser(loggedIn);
     setRequests(allRequests);
     setBooks(allBooks);
     setUsersByRole(userRoles);
@@ -48,7 +51,7 @@ export default function LibrarianBorrowRequests() {
       r.bookId === selectedRequest.bookId &&
       r.studentId === selectedRequest.studentId &&
       r.status === "Requested"
-        ? { ...r, status: "Borrowed", approvedDate: new Date().toISOString() }
+        ? { ...r, status: "Borrowed", approvedDate: new Date().toISOString(),approvedBy: currentUser?.userId, }
         : r
     );
     localStorage.setItem("borrowRequests", JSON.stringify(updated));
