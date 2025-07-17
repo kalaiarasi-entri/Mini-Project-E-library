@@ -18,10 +18,10 @@ export default function StudentDashboard() {
 
     setTimeout(() => {
       setDataReady(true);
-    }, 300); // Simulate progressive load
+    }, 300);
   }, []);
 
-  // Chart 1: Available Books by Department
+  // Chart 1: Books by Department
   const deptMap = {};
   books.forEach(book => {
     const dept = book.department?.trim() || book.type || 'Unknown';
@@ -41,9 +41,7 @@ export default function StudentDashboard() {
           dynamicAnimation: { enabled: true, speed: 800 }
         }
       },
-      plotOptions: {
-        bar: { borderRadius: 6, columnWidth: '60%' }
-      },
+      plotOptions: { bar: { borderRadius: 6, columnWidth: '60%' } },
       dataLabels: { enabled: true, style: { colors: ['#fff'] } },
       xaxis: {
         categories: Object.keys(deptMap),
@@ -55,10 +53,10 @@ export default function StudentDashboard() {
     series: [{ name: 'Available Books', data: Object.values(deptMap) }]
   };
 
-  // Chart 2: Donut chart - Borrow Request Status
+  // Chart 2: Donut - Borrow Request Status
   const statusList = ['Requested', 'Borrowed', 'Returned'];
-  const statusCounts = statusList.map(status =>
-    borrowRequests.filter(req => req.status === status).length
+  const statusCounts = statusList.map(
+    status => borrowRequests.filter(req => req.status === status).length
   );
 
   const donutChart = {
@@ -81,12 +79,12 @@ export default function StudentDashboard() {
       plotOptions: {
         pie: { donut: { size: '65%' } }
       },
-      colors: ['#64748b', '#4b5563', '#1e293b'] // Cool grayscale
+      colors: ['#64748b', '#4b5563', '#1e293b']
     },
     series: statusCounts
   };
 
-  // Chart 3: Most Frequently Borrowed Book Types (Pie)
+  // Chart 3: Pie - Most Borrowed Book Types
   const typeMap = {};
   borrowRequests.forEach(req => {
     const book = books.find(b => b.bookId === req.bookId);
@@ -119,7 +117,7 @@ export default function StudentDashboard() {
   return (
     <div className="container mt-4 text-white">
       <div className="row g-4">
-        {/* Chart 1: Bar - Available Books by Department */}
+        {/* Chart 1: Bar - Books by Department */}
         <div className="col-md-6">
           <div className="card bg-dark shadow animate__animated animate__fadeInLeft">
             <div className="card-body">
@@ -132,7 +130,9 @@ export default function StudentDashboard() {
                   height={300}
                 />
               ) : (
-                <p className="text-muted">Loading...</p>
+                <div style={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <p className="text-muted">Loading...</p>
+                </div>
               )}
             </div>
           </div>
@@ -143,16 +143,18 @@ export default function StudentDashboard() {
           <div className="card bg-dark shadow animate__animated animate__fadeInRight">
             <div className="card-body">
               <h5 className="card-title">Borrow Request Status</h5>
-              {dataReady && donutChart.series.some(val => val > 0) ? (
-                <Chart
-                  options={donutChart.options}
-                  series={donutChart.series}
-                  type="donut"
-                  height={300}
-                />
-              ) : (
-                <p className="text-muted">No borrow request data.</p>
-              )}
+              <div style={{ minHeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {dataReady && donutChart.series.some(val => val > 0) ? (
+                  <Chart
+                    options={donutChart.options}
+                    series={donutChart.series}
+                    type="donut"
+                    height={300}
+                  />
+                ) : (
+                  <p className="text-muted">No borrow request data.</p>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -163,16 +165,18 @@ export default function StudentDashboard() {
             <div className="card-body">
               <h5 className="card-title">Most Borrowed Book Types</h5>
               <small className="text-muted">Based on your borrowing activity</small>
-              {dataReady && pieChart.series.length > 0 ? (
-                <Chart
-                  options={pieChart.options}
-                  series={pieChart.series}
-                  type="pie"
-                  height={300}
-                />
-              ) : (
-                <p className="text-white">No borrowing data found.</p>
-              )}
+              <div style={{ minHeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {dataReady && pieChart.series.length > 0 ? (
+                  <Chart
+                    options={pieChart.options}
+                    series={pieChart.series}
+                    type="pie"
+                    height={300}
+                  />
+                ) : (
+                  <p className="text-white">No borrowing data found.</p>
+                )}
+              </div>
             </div>
           </div>
         </div>
