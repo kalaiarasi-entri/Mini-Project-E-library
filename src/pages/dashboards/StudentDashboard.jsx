@@ -12,7 +12,7 @@ export default function StudentDashboard() {
     const requestsData = JSON.parse(localStorage.getItem('borrowRequests')) || [];
     const user = JSON.parse(localStorage.getItem('user'));
 
-    const studentRequests = requestsData.filter(req => req.studentId === user?.email);
+    const studentRequests = requestsData.filter(req => req.studentId === user?.userId);
     setBooks(booksData);
     setBorrowRequests(studentRequests);
 
@@ -121,7 +121,7 @@ export default function StudentDashboard() {
         <div className="col-md-6">
           <div className="card bg-dark shadow animate__animated animate__fadeInLeft">
             <div className="card-body">
-              <h5 className="card-title">Books by Department</h5>
+              <h5 className="card-title text-white mb-4 text-center">Books by Department</h5>
               {dataReady ? (
                 <Chart
                   options={deptChart.options}
@@ -142,7 +142,7 @@ export default function StudentDashboard() {
         <div className="col-md-6">
           <div className="card bg-dark shadow animate__animated animate__fadeInRight">
             <div className="card-body">
-              <h5 className="card-title">Borrow Request Status</h5>
+              <h5 className="card-title text-white mb-4 text-center">Borrow Request Status</h5>
               <div style={{ minHeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {dataReady && donutChart.series.some(val => val > 0) ? (
                   <Chart
@@ -163,7 +163,7 @@ export default function StudentDashboard() {
         <div className="col-md-12">
           <div className="card bg-dark shadow animate__animated animate__fadeInUp">
             <div className="card-body">
-              <h5 className="card-title">Most Borrowed Book Types</h5>
+              <h5 className="card-title text-white mb-4 text-center">Most Borrowed Book Types</h5>
               <small className="text-muted">Based on your borrowing activity</small>
               <div style={{ minHeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {dataReady && pieChart.series.length > 0 ? (

@@ -15,7 +15,7 @@ export default function MyBooks() {
   useEffect(() => {
     const storedBooks = JSON.parse(localStorage.getItem('books')) || [];
     const allRequests = JSON.parse(localStorage.getItem('borrowRequests')) || [];
-    const studentRequests = allRequests.filter(r => r.studentId === currentUser?.email);
+    const studentRequests = allRequests.filter(r => r.studentId === currentUser?.userId);
     setBooks(storedBooks);
     setRequests(studentRequests);
   }, []);
@@ -32,7 +32,7 @@ export default function MyBooks() {
 
     const newRequest = {
       bookId: book.bookId,
-      studentId: currentUser.email,
+      studentId: currentUser.userId,
       bookTitle: book.title,
       requestDate: new Date().toISOString(),
       status: 'Requested'

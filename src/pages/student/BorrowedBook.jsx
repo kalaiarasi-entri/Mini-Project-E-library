@@ -24,7 +24,7 @@ export default function BorrowedBooks() {
     const allRequests = JSON.parse(localStorage.getItem("borrowRequests")) || [];
 
     const studentRequests = allRequests.filter(
-      (r) => r.studentId === currentUser?.email
+      (r) => r.studentId === currentUser?.userId
     );
 
     const allBooks = JSON.parse(localStorage.getItem("books")) || [];
@@ -83,7 +83,7 @@ export default function BorrowedBooks() {
     const globalIndex = allRequests.findIndex(
       (r) =>
         r.bookId === selectedRequest.bookId &&
-        r.studentId === currentUser.email &&
+        r.studentId === currentUser.userId &&
         r.status === "Borrowed"
     );
 

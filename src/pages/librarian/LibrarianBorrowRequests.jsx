@@ -38,8 +38,8 @@ export default function LibrarianBorrowRequests() {
   const getBookTitle = (bookId) =>
     books.find((b) => b.bookId === bookId)?.title || null;
 
-  const getStudentName = (email) =>
-    usersByRole?.student?.find((u) => u.email === email)?.username || null;
+  const getStudentName = (studntId) =>
+    usersByRole?.student?.find((u) => u.userId === studntId)?.username || null;
 
   const openApproveModal = (req) => {
     setSelectedRequest(req);
