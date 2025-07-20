@@ -46,6 +46,8 @@ export default function Layout() {
   const getPageTitle = () => {
     const path = location.pathname;
     if (path.includes("admin-dashboard")) return "Admin Dashboard";
+    if (path.includes("admin-reports")) return "Student Reports";
+    if (path.includes("users")) return "Manage Users";
     if (path.includes("librarian-dashboard")) return "Librarian Dashboard";
     if (path.includes("borrowed-books")) return "Borrowed Books";
     if (path.includes("books") && !path.includes("my-books"))
@@ -55,6 +57,9 @@ export default function Layout() {
     if (path.includes("my-books")) return "My Books";
     if (path.includes("profile")) return "My Profile";
     if (path.includes("guest-dashboard")) return "Guest Dashboard";
+    if (path.includes("students-details")) return "Student Details";
+    if (path.includes("student-reports")) return "Student Reports";
+
     return "Dashboard";
   };
 
@@ -93,6 +98,20 @@ export default function Layout() {
             className="text-primary animate__animated animate__fadeInLeft"
           />
         );
+        case "Student Details":
+        return (
+          <User
+            size={26}
+            className="text-white animate__animated animate__fadeInLeft"
+          />
+        );
+        case "Student Reports":
+        return (
+          <FileText
+            size={26}
+            className="text-white animate__animated animate__fadeInLeft"
+          />
+        );
       default:
         return (
           <LayoutDashboard
@@ -115,7 +134,7 @@ export default function Layout() {
       label: "Manage Users",
     },
     role === "admin" && {
-      path: "/admin-reports",
+      path: "/student-reports",
       icon: <FileText size={18} />,
       label: "Reports",
     },
@@ -133,6 +152,21 @@ export default function Layout() {
       path: "/borrow-requests",
       icon: <Library size={18} />,
       label: "Borrow Requests",
+    },
+     role === "faculty" && {
+      path: "/faculty-dashboard",
+      icon: <LayoutDashboard size={18} />,
+      label: "Dashboard",
+    },
+     role === "faculty" && {
+      path: "/students-details",
+      icon: <Users size={18} />,
+      label: "Students",
+    },
+    role === "faculty" && {
+      path: "/student-reports",
+      icon: <FileText size={18} />,
+      label: "Reports",
     },
     role === "student" && {
       path: "/student-dashboard",

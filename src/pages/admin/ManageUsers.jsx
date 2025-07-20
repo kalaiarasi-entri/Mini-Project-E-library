@@ -243,7 +243,7 @@ export default function ManageUsers() {
         centered
         className="animate__animated animate__fadeInDown"
       >
-        <Modal.Header closeButton className="bg-dark text-white">
+        <Modal.Header closeButton className="bg-dark text-white"  closeVariant="white">
           <Modal.Title>User Details</Modal.Title>
         </Modal.Header>
         <Modal.Body className="bg-dark text-white">
@@ -278,7 +278,7 @@ export default function ManageUsers() {
         centered
         className="animate__animated animate__zoomIn"
       >
-        <Modal.Header closeButton className="bg-dark text-white">
+        <Modal.Header closeButton className="bg-dark text-white" closeVariant="white">
           <Modal.Title>{editMode ? "Edit User" : "Add User"}</Modal.Title>
         </Modal.Header>
         <Modal.Body className="bg-dark text-white">

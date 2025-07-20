@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Search, Filter, ArrowDownUp, Eye } from "lucide-react";
 import "animate.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "./Admin.css"; // Or wherever you placed flip card styles
 
 export default function AdminReports() {
   const [users, setUsers] = useState([]);
@@ -14,13 +15,14 @@ export default function AdminReports() {
   const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
-    const storedUsersByRole = JSON.parse(localStorage.getItem("usersByRole")) || {};
+    const storedUsersByRole =
+      JSON.parse(localStorage.getItem("usersByRole")) || {};
     const storedUsers = Object.values(storedUsersByRole).flat();
-    const storedRequests = JSON.parse(localStorage.getItem("borrowRequests")) || [];
+    const storedRequests =
+      JSON.parse(localStorage.getItem("borrowRequests")) || [];
     const storedBooks = JSON.parse(localStorage.getItem("books")) || [];
     setUsers(storedUsers);
     setBorrowRequests(storedRequests);
-    console.log("bor",storedRequests)
     setBooks(storedBooks);
   }, []);
 
@@ -62,12 +64,8 @@ export default function AdminReports() {
 
   return (
     <div className="container mt-4 text-white">
-      {/* <h3 className="mb-4 text-info animate__animated animate__fadeInDown">
-        📊 Admin Reports – Student Borrowing Summary
-      </h3> */}
-
       {/* Search, Filter, Sort */}
-      <div className="d-flex flex-wrap gap-3 mb-4">
+      <div className="d-flex flex-wrap gap-5 mb-4">
         <div className="input-group w-auto">
           <span className="input-group-text bg-dark text-white border-secondary">
             <Search size={16} />
@@ -115,35 +113,65 @@ export default function AdminReports() {
         </div>
       </div>
 
-      {/* Student Cards */}
-      <div className="row g-4">
+      {/* Flip Cards */}
+      <div className="row g-4 mt-4">
         {visibleUsers.map((user, idx) => (
           <div key={idx} className="col-md-4">
-            <div className="card bg-dark text-white border-info shadow animate__animated animate__fadeInUp h-100">
-              <div className="card-body">
-                <h5 className="card-title text-info fw-bold">
-                  {user.username}
-                </h5>
-                <p className="card-text small">
-                  <strong>Email:</strong>{" "}
-                  <span className="text-light">{user.email}</span> <br />
-                  <strong>Department:</strong>{" "}
-                  <span className="badge bg-info text-dark">
-                    {user.department}
-                  </span>{" "}
-                  <br />
-                  <strong>Books Borrowed:</strong>{" "}
-                  <span className="badge bg-warning text-dark">
-                    {borrowCount(user)}
-                  </span>
-                </p>
-                <button
-                  className="btn btn-outline-info btn-sm mt-2 rounded-pill"
-                  onClick={() => setSelectedUser(user)}
-                >
-                  <Eye size={16} className="me-1" />
-                  View Borrow History
-                </button>
+            <div className="flip-card shadow">
+              <div className="flip-card-inner">
+                <div className="flip-card-front d-flex flex-column justify-content-center align-items-center">
+                  <h5 className="fw-bold text-white text-capitalize mt-2 py-2 border-bottom border-secondary">
+                    {user.username}
+                  </h5>
+                  <div className="mt-2 animate__animated animate__pulse">
+                    <div className="p-3 text-white">
+                      <div className="mb-3 d-flex align-items-center">
+                        <i className="bi bi-envelope-fill me-2 text-info"></i>
+                        <span>
+                          <strong>Email:</strong> {user.email}
+                        </span>
+                      </div>
+                      <div className="mb-3 d-flex align-items-center">
+                        <i className="bi bi-building me-2 text-warning"></i>
+                        <span>
+                          <strong>Department:</strong>{" "}
+                          <span className="badge bg-primary bg-opacity-75 text-light px-2 py-1 rounded-pill">
+                            {user.department}
+                          </span>
+                        </span>
+                      </div>
+
+                      <div className="d-flex align-items-center">
+                        <i className="bi bi-journal-bookmark-fill me-2 text-success"></i>
+                        <span>
+                          <strong>Books Count:</strong>{" "}
+                          <span className="text-white fw-bold">
+                            {borrowCount(user)}
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p
+                    className="text-white small mt-2 animate__animated animate__tada  animate__infinite"
+                    style={{ animationDuration: "3s" }}
+                  >
+                    Hover to flip →
+                  </p>
+                </div>
+                <div className="flip-card-back card border-secondary shadow d-flex align-items-center justify-content-center">
+                  <div>
+                    <p className="fw-bold">View Borrow History</p>
+                    <button
+                      className="btn btn-primary rounded-pill"
+                      onClick={() => setSelectedUser(user)}
+                    >
+                      <Eye size={16} className="me-1" />
+                      View Details
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -164,12 +192,22 @@ export default function AdminReports() {
 
       {/* View Modal */}
       {selectedUser && (
-        <div className="modal fade show d-block animate__animated animate__fadeInDown" tabIndex="-1">
+        <div
+          className="modal fade show d-block animate__animated animate__fadeInDown"
+          tabIndex="-1"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.6)" }} // overlay effect
+        >
           <div className="modal-dialog modal-lg">
-            <div className="modal-content bg-dark text-white border-info">
+            <div
+              className="modal-content bg-dark text-white border-secondary rounded-4 shadow-lg"
+              style={{
+                background: "rgba(33, 37, 41, 0.9)", // dark + semi-transparent
+                backdropFilter: "blur(8px)", // glass effect
+              }}
+            >
               <div className="modal-header border-secondary">
-                <h5 className="modal-title text-info">
-                  📚 {selectedUser.username}'s Borrow History
+                <h5 className="modal-title text-light text-capitalize">
+                  {selectedUser.username}'s Borrow History
                 </h5>
                 <button
                   className="btn-close btn-close-white"
@@ -184,7 +222,7 @@ export default function AdminReports() {
                   <strong>Department:</strong> {selectedUser.department}
                 </p>
                 <hr />
-                <h6 className="mb-3 text-warning">📖 Borrowed Books:</h6>
+                <h6 className="mb-3 text-warning">Books Borrowed:</h6>
                 <ul className="list-group list-group-flush">
                   {borrowRequests
                     .filter((r) => r.studentId === selectedUser.userId)
@@ -193,9 +231,16 @@ export default function AdminReports() {
                         key={i}
                         className="list-group-item bg-dark text-white border-secondary"
                       >
-                        <strong className="text-warning">{getBookName(r.bookId)}</strong> <br />
+                        <strong className="text-warning">
+                          {getBookName(r.bookId)}
+                        </strong>{" "}
+                        <br />
                         Status:{" "}
-                        <span className={`badge bg-${getStatusBadge(r.status)} ms-1`}>
+                        <span
+                          className={`badge bg-${getStatusBadge(
+                            r.status
+                          )} ms-1`}
+                        >
                           {r.status}
                         </span>{" "}
                         | Date: {r.requestDate}
@@ -205,7 +250,7 @@ export default function AdminReports() {
               </div>
               <div className="modal-footer border-secondary">
                 <button
-                  className="btn btn-outline-light rounded-pill"
+                  className="btn btn-primary rounded-pill"
                   onClick={() => setSelectedUser(null)}
                 >
                   Close

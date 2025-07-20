@@ -16,6 +16,8 @@ import ManageBooks from "../pages/librarian/ManageBooks";
 import MyBooks from "../pages/student/MyBooks";
 import BorrowedBooks from "../pages/student/BorrowedBook";
 import LibrarianBorrowRequests from "../pages/librarian/LibrarianBorrowRequests";
+import StudentDetails from "../pages/faculty/StudentDetails";
+
 
 export default function AppRoutes() {
   return (
@@ -43,9 +45,9 @@ export default function AppRoutes() {
           }
         />
         <Route
-          path="/admin-reports"
+          path="/student-reports"
           element={
-            <ProtectedRoute allowedRoles={["admin"]}>
+            <ProtectedRoute allowedRoles={["admin","faculty"]}>
               <AdminReports  />
             </ProtectedRoute>
           }
@@ -109,6 +111,14 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute allowedRoles={["faculty"]}>
               <FacultyDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/students-details"
+          element={
+            <ProtectedRoute allowedRoles={["faculty"]}>
+              <StudentDetails  />
             </ProtectedRoute>
           }
         />
