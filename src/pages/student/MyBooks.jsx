@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { BookOpen, CheckCircle, XCircle, Search, ArrowDownUp, Filter } from 'lucide-react';
+import {
+  BookOpen,
+  CheckCircle,
+  Search,
+  ArrowDownUp,
+  Filter,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import 'animate.css';
 
 export default function MyBooks() {
@@ -10,6 +18,9 @@ export default function MyBooks() {
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState('title');
   const [filter, setFilter] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+
   const currentUser = JSON.parse(localStorage.getItem('user'));
 
   useEffect(() => {
@@ -64,12 +75,19 @@ export default function MyBooks() {
       return 0;
     });
 
+  // Pagination logic
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const paginatedBooks = filtered.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
     <div className="container mt-4 text-white animate__animated animate__fadeIn">
       {/* Search, Sort, Filter Controls */}
       <div className="row g-3 mb-4">
         <div className="col-md-4">
-          <label className="form-label text-white d-flex gap-2 align-items-center">
+          <label className="form-label d-flex gap-2 align-items-center">
             <Search size={18} /> Search
           </label>
           <div className="input-group shadow-sm">
@@ -81,19 +99,25 @@ export default function MyBooks() {
               className="form-control bg-dark text-white border-secondary"
               placeholder="Search by title, author or description"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setCurrentPage(1); // reset page on search
+              }}
             />
           </div>
         </div>
 
         <div className="col-md-4">
-          <label className="form-label text-white d-flex gap-2 align-items-center">
+          <label className="form-label d-flex gap-2 align-items-center">
             <ArrowDownUp size={18} /> Sort By
           </label>
           <select
             className="form-select bg-dark text-white border-secondary shadow-sm"
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
+            onChange={(e) => {
+              setSortBy(e.target.value);
+              setCurrentPage(1); // reset page on sort
+            }}
           >
             <option value="title">Title</option>
             <option value="date">Added Date</option>
@@ -101,13 +125,16 @@ export default function MyBooks() {
         </div>
 
         <div className="col-md-4">
-          <label className="form-label text-white d-flex gap-2 align-items-center">
+          <label className="form-label d-flex gap-2 align-items-center">
             <Filter size={18} /> Filter
           </label>
           <select
             className="form-select bg-dark text-white border-secondary shadow-sm"
             value={filter}
-            onChange={(e) => setFilter(e.target.value)}
+            onChange={(e) => {
+              setFilter(e.target.value);
+              setCurrentPage(1); // reset page on filter
+            }}
           >
             <option value="all">All Books</option>
             <option value="requested">Requested Only</option>
@@ -116,7 +143,7 @@ export default function MyBooks() {
       </div>
 
       {/* Book Table */}
-      {filtered.length === 0 ? (
+      {paginatedBooks.length === 0 ? (
         <div className="text-center p-5 text-white fs-5 fst-italic border border-secondary rounded">
           No books available.
         </div>
@@ -133,9 +160,9 @@ export default function MyBooks() {
             </tr>
           </thead>
           <tbody>
-            {filtered.map((b, i) => (
+            {paginatedBooks.map((b, i) => (
               <tr key={b.bookId} className="animate__animated animate__fadeInUp">
-                <td>{i + 1}</td>
+                <td>{(currentPage - 1) * itemsPerPage + i + 1}</td>
                 <td>{b.title}</td>
                 <td>{b.type}</td>
                 <td>{b.author}</td>
@@ -161,6 +188,40 @@ export default function MyBooks() {
             ))}
           </tbody>
         </table>
+      )}
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <nav className="d-flex justify-content-center mt-4">
+          <ul className="pagination pagination-sm mb-0">
+            <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+              <button
+                className="page-link bg-dark text-white border-secondary"
+                onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+              >
+                <ChevronLeft size={16} />
+              </button>
+            </li>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <li key={page} className={`page-item ${page === currentPage ? 'active' : ''}`}>
+                <button
+                  className="page-link bg-dark text-white border-secondary"
+                  onClick={() => setCurrentPage(page)}
+                >
+                  {page}
+                </button>
+              </li>
+            ))}
+            <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+              <button
+                className="page-link bg-dark text-white border-secondary"
+                onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+              >
+                <ChevronRight size={16} />
+              </button>
+            </li>
+          </ul>
+        </nav>
       )}
 
       {/* Confirmation Modal */}

@@ -118,7 +118,7 @@ export default function FacultyDashboard() {
         <div className="row g-4">
           {/* Donut - Department Distribution */}
           <div className="col-md-6">
-            <div className="card bg-dark p-3 shadow animate__animated animate__flipInX">
+            <div className="card bg-dark p-3 shadow ">
               <h5 className="text-center mb-3 text-white">
                 Student Count by Department
               </h5>
@@ -139,7 +139,7 @@ export default function FacultyDashboard() {
 
           {/* Radial Chart - Overall Students */}
           <div className="col-md-6">
-            <div className="card bg-dark p-3 shadow animate__animated animate__flipInX animate__delay-1s">
+            <div className="card bg-dark p-3 shadow">
               <h5 className="text-center mb-3 text-white">Student Overview</h5>
               <ApexCharts
                 options={radialOptions}
@@ -151,7 +151,7 @@ export default function FacultyDashboard() {
           </div>
 
           {/* Top Borrowing Students - Horizontal Bar */}
-          <div className="col-md-6">
+          <div className="col-md-6 ">
             <div className="card bg-dark p-3 shadow animate__animated ">
               <h5 className="text-center mb-3 text-white">
                 Top Borrowing Students
@@ -178,7 +178,7 @@ export default function FacultyDashboard() {
 
           {/* Borrow Request Status Pie Chart */}
           <div className="col-md-6">
-            <div className="card bg-dark p-3 shadow animate__animated animate__flipInX">
+            <div className="card bg-dark p-3 shadow">
               <h5 className="text-center mb-3 text-white">
                 Borrow Request Status Distribution
               </h5>

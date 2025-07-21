@@ -5,6 +5,8 @@ import {
   Search,
   Filter,
   CalendarDays,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import "animate.css";
 
@@ -20,8 +22,12 @@ export default function BorrowedBooks() {
 
   const currentUser = JSON.parse(localStorage.getItem("user"));
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
   useEffect(() => {
-    const allRequests = JSON.parse(localStorage.getItem("borrowRequests")) || [];
+    const allRequests =
+      JSON.parse(localStorage.getItem("borrowRequests")) || [];
 
     const studentRequests = allRequests.filter(
       (r) => r.studentId === currentUser?.userId
@@ -79,7 +85,8 @@ export default function BorrowedBooks() {
       updatedRequests[index].returnDate = new Date().toISOString();
     }
 
-    const allRequests = JSON.parse(localStorage.getItem("borrowRequests")) || [];
+    const allRequests =
+      JSON.parse(localStorage.getItem("borrowRequests")) || [];
     const globalIndex = allRequests.findIndex(
       (r) =>
         r.bookId === selectedRequest.bookId &&
@@ -111,12 +118,22 @@ export default function BorrowedBooks() {
     .sort((a, b) => {
       const aBook = getBook(a.bookId);
       const bBook = getBook(b.bookId);
-      if (sortBy === "title") return (aBook?.title || "").localeCompare(bBook?.title || "");
-      if (sortBy === "requestedDate") return new Date(b.requestDate) - new Date(a.requestDate);
-      if (sortBy === "approvedDate") return new Date(b.approvedDate || 0) - new Date(a.approvedDate || 0);
-      if (sortBy === "returnDate") return new Date(b.returnDate || 0) - new Date(a.returnDate || 0);
+      if (sortBy === "title")
+        return (aBook?.title || "").localeCompare(bBook?.title || "");
+      if (sortBy === "requestedDate")
+        return new Date(b.requestDate) - new Date(a.requestDate);
+      if (sortBy === "approvedDate")
+        return new Date(b.approvedDate || 0) - new Date(a.approvedDate || 0);
+      if (sortBy === "returnDate")
+        return new Date(b.returnDate || 0) - new Date(a.returnDate || 0);
       return 0;
     });
+
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const paginatedRequests = filtered.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <div className="container mt-4 text-white animate__animated animate__fadeIn">
@@ -196,12 +213,14 @@ export default function BorrowedBooks() {
                 </td>
               </tr>
             ) : (
-              filtered.map((req, i) => {
+              paginatedRequests.map((req, i) => {
                 const book = getBook(req.bookId);
                 return (
                   <tr key={i} className="animate__animated animate__fadeInUp">
-                    <td>{i + 1}</td>
-                    <td>{book?.title || <em className="text-danger">Deleted</em>}</td>
+                    <td>{(currentPage - 1) * itemsPerPage + i + 1}</td>
+                    <td>
+                      {book?.title || <em className="text-danger">Deleted</em>}
+                    </td>
                     <td>{formatDate(req.requestDate)}</td>
                     <td>{formatDate(req.approvedDate)}</td>
                     <td>{getLibrarianName(req.approvedBy)}</td>
@@ -233,6 +252,61 @@ export default function BorrowedBooks() {
             )}
           </tbody>
         </table>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="d-flex justify-content-center mt-4">
+            <nav>
+              <ul className="pagination pagination-sm mb-0">
+                <li
+                  className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                >
+                  <button
+                    className="page-link bg-dark text-white border-secondary"
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                </li>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <li
+                      key={page}
+                      className={`page-item ${
+                        page === currentPage ? "active" : ""
+                      }`}
+                    >
+                      <button
+                        className="page-link bg-dark text-white border-secondary"
+                        onClick={() => setCurrentPage(page)}
+                      >
+                        {page}
+                      </button>
+                    </li>
+                  )
+                )}
+
+                <li
+                  className={`page-item ${
+                    currentPage === totalPages ? "disabled" : ""
+                  }`}
+                >
+                  <button
+                    className="page-link bg-dark text-white border-secondary"
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        )}
       </div>
 
       {/* Return Modal */}

@@ -1,38 +1,91 @@
 .flip-card {
-  background-color: transparent;
-  width: 100%;
-  height: 250px;
   perspective: 1000px;
+  height: 250px;
 }
 
 .flip-card-inner {
   position: relative;
   width: 100%;
   height: 100%;
-  text-align: center;
-  transition: transform 0.8s;
+  transition: transform 0.6s ease;
   transform-style: preserve-3d;
+  border-radius: 1rem;
 }
 
 .flip-card:hover .flip-card-inner {
   transform: rotateY(180deg);
 }
 
-.flip-card-front, .flip-card-back {
+.flip-card-front,
+.flip-card-back {
   position: absolute;
   width: 100%;
   height: 100%;
-  border-radius: 0.375rem;
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
   backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: rgba(30, 41, 59, 0.95);
+  color: #e2e8f0;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
 }
 
-.flip-card-front {
-  background-color: #343a40;
-  color: white;
+.flip-card-front h5 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.flip-card-front .info {
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 
 .flip-card-back {
-  background-color: #6c757d;
-  color: white;
   transform: rotateY(180deg);
+  background: #2563eb;
+  color: white;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.hover-hint {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-top: auto;
+}
+
+/* Modern View Pill */
+.view-pill {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  color: white;
+  font-weight: 500;
+  font-size: 0.85rem;
+  backdrop-filter: blur(6px);
+  transition: all 0.3s ease;
+}
+
+.view-pill:hover {
+  background: white;
+  color: #1d4ed8;
+  text-decoration: none;
+  box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1);
+}
+
+/* pagination css */
+.page-link {
+  transition: all 0.3s ease-in-out;
+}
+.page-item.active .page-link {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: white;
 }

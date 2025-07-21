@@ -1,60 +1,66 @@
-import React, { useEffect, useState } from 'react';
-import { Pencil, Trash2, Plus } from 'lucide-react';
-import 'animate.css';
-import 'bootstrap-icons/font/bootstrap-icons.css';
+import React, { useEffect, useState } from "react";
+import { Pencil, Trash2, Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import "animate.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 export default function ManageBooks() {
   const [books, setBooks] = useState([]);
-  const [search, setSearch] = useState('');
-  const [sortBy, setSortBy] = useState('title');
-  const [filterType, setFilterType] = useState('All');
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [filterType, setFilterType] = useState("All");
   const [formData, setFormData] = useState({
-    bookId: '',
-    title: '',
-    type: '',
-    description: '',
-    author: '',
+    bookId: "",
+    title: "",
+    type: "",
+    description: "",
+    author: "",
     file: null,
-    fileName: '',
-    fileURL: '',
-    createdAt: '',
-    createdBy: ''
+    fileName: "",
+    fileURL: "",
+    createdAt: "",
+    createdBy: "",
   });
   const [editIndex, setEditIndex] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(null);
 
-  const currentUser = JSON.parse(localStorage.getItem('user'));
+  const currentUser = JSON.parse(localStorage.getItem("user"));
+
+  //Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  //const totalPages = Math.ceil(filtered.length / itemsPerPage);
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem('books')) || [];
+    const stored = JSON.parse(localStorage.getItem("books")) || [];
     setBooks(stored);
   }, []);
 
   const resetForm = () => {
     setFormData({
-      bookId: '',
-      title: '',
-      type: '',
-      description: '',
-      author: '',
+      bookId: "",
+      title: "",
+      type: "",
+      description: "",
+      author: "",
       file: null,
-      fileName: '',
-      fileURL: '',
-      createdAt: '',
-      createdBy: ''
+      fileName: "",
+      fileURL: "",
+      createdAt: "",
+      createdBy: "",
     });
     setEditIndex(null);
   };
 
   const openModal = (bookId = null) => {
     if (bookId) {
-      const index = books.findIndex(b => b.bookId === bookId);
+      const index = books.findIndex((b) => b.bookId === bookId);
       const book = books[index];
       setFormData({
         ...book,
-        file: null
+        file: null,
       });
       setEditIndex(index);
     } else {
@@ -76,24 +82,24 @@ export default function ManageBooks() {
   const handleDeleteConfirmed = () => {
     const updated = books.filter((_, i) => i !== deleteIndex);
     setBooks(updated);
-    localStorage.setItem('books', JSON.stringify(updated));
+    localStorage.setItem("books", JSON.stringify(updated));
     setShowConfirm(false);
   };
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    if (name === 'file') {
+    if (name === "file") {
       const file = files[0];
       setFormData((prev) => ({
         ...prev,
         file,
         fileName: file.name,
-        fileURL: URL.createObjectURL(file)
+        fileURL: URL.createObjectURL(file),
       }));
     } else {
       setFormData((prev) => ({
         ...prev,
-        [name]: value
+        [name]: value,
       }));
     }
   };
@@ -104,8 +110,8 @@ export default function ManageBooks() {
       ...formData,
       bookId: formData.bookId || crypto.randomUUID(),
       createdAt: formData.createdAt || new Date().toISOString(),
-      createdBy: currentUser?.username || 'Unknown',
-      userId: currentUser?.userId
+      createdBy: currentUser?.username || "Unknown",
+      userId: currentUser?.userId,
     };
 
     const updated = [...books];
@@ -116,7 +122,7 @@ export default function ManageBooks() {
     }
 
     setBooks(updated);
-    localStorage.setItem('books', JSON.stringify(updated));
+    localStorage.setItem("books", JSON.stringify(updated));
     closeModal();
   };
 
@@ -126,11 +132,14 @@ export default function ManageBooks() {
         field.toLowerCase().includes(search.toLowerCase())
       )
     )
-    .filter((b) => filterType === 'All' || b.type === filterType)
+    .filter((b) => filterType === "All" || b.type === filterType)
     .sort((a, b) => {
-      if (sortBy === 'createdAt') return new Date(a.createdAt) - new Date(b.createdAt); // newer last
+      if (sortBy === "createdAt")
+        return new Date(b.createdAt) - new Date(a.createdAt); // newer first
       return a[sortBy].localeCompare(b[sortBy]);
     });
+
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
 
   return (
     <div className="container mt-4 text-white animate__animated animate__fadeIn">
@@ -211,45 +220,123 @@ export default function ManageBooks() {
         <tbody>
           {filtered.length === 0 ? (
             <tr>
-              <td colSpan="9" className="text-center text-white">No records found</td>
+              <td colSpan="9" className="text-center text-white">
+                No records found
+              </td>
             </tr>
           ) : (
-            filtered.map((b, i) => (
-              <tr key={b.bookId} className="animate__animated animate__fadeInUp">
-                <td>{i + 1}</td>
-                <td>{b.title}</td>
-                <td>{b.type}</td>
-                <td>{b.author}</td>
-                <td>{b.description}</td>
-                <td>
-                  {b.fileURL ? (
-                    <a href={b.fileURL} target="_blank" rel="noreferrer">View</a>
-                  ) : 'N/A'}
-                </td>
-                <td>{b.createdBy}</td>
-                <td>{new Date(b.createdAt).toLocaleDateString()}</td>
-                <td>
-                  <button className="btn btn-primary btn-sm me-2" onClick={() => openModal(b.bookId)}>
-                    <Pencil size={16} />
-                  </button>
-                  <button className="btn btn-danger btn-sm" onClick={() => confirmDelete(books.findIndex(book => book.bookId === b.bookId))}>
-                    <Trash2 size={16} />
-                  </button>
-                </td>
-              </tr>
-            ))
+            filtered
+              .slice(
+                (currentPage - 1) * itemsPerPage,
+                currentPage * itemsPerPage
+              )
+              .map((b, i) => (
+                <tr
+                  key={b.bookId}
+                  className="animate__animated animate__fadeInUp"
+                >
+                  <td>{(currentPage - 1) * itemsPerPage + i + 1}</td>
+                  <td>{b.title}</td>
+                  <td>{b.type}</td>
+                  <td>{b.author}</td>
+                  <td>{b.description}</td>
+                  <td>
+                    {b.fileURL ? (
+                      <a href={b.fileURL} target="_blank" rel="noreferrer">
+                        View
+                      </a>
+                    ) : (
+                      "N/A"
+                    )}
+                  </td>
+                  <td>{b.createdBy}</td>
+                  <td>{new Date(b.createdAt).toLocaleDateString()}</td>
+                  <td>
+                    <button
+                      className="btn btn-primary btn-sm me-2"
+                      onClick={() => openModal(b.bookId)}
+                    >
+                      <Pencil size={16} />
+                    </button>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() =>
+                        confirmDelete(
+                          books.findIndex((book) => book.bookId === b.bookId)
+                        )
+                      }
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </td>
+                </tr>
+              ))
           )}
         </tbody>
       </table>
+      {/* Pagination */}
+      <div className="d-flex justify-content-center mt-4">
+        <nav>
+          <ul className="pagination pagination-sm mb-0">
+            <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+              <button
+                className="page-link bg-dark text-white border-secondary"
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              >
+                <ChevronLeft size={16} />
+              </button>
+            </li>
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <li
+                key={page}
+                className={`page-item ${page === currentPage ? "active" : ""}`}
+              >
+                <button
+                  className="page-link bg-dark text-white border-secondary"
+                  onClick={() => setCurrentPage(page)}
+                >
+                  {page}
+                </button>
+              </li>
+            ))}
+
+            <li
+              className={`page-item ${
+                currentPage === totalPages ? "disabled" : ""
+              }`}
+            >
+              <button
+                className="page-link bg-dark text-white border-secondary"
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+              >
+                <ChevronRight size={16} />
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
 
       {/* Modal for Add/Edit */}
       {showModal && (
-        <div className="modal d-block fade show animate__animated animate__zoomIn" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}>
+        <div
+          className="modal d-block fade show animate__animated animate__zoomIn"
+          tabIndex="-1"
+          style={{ backgroundColor: "rgba(0,0,0,0.7)" }}
+        >
           <div className="modal-dialog modal-lg modal-dialog-centered">
             <div className="modal-content bg-dark text-white">
               <div className="modal-header">
-                <h5 className="modal-title">{editIndex !== null ? 'Edit Book' : 'Add Book'}</h5>
-                <button type="button" className="btn-close btn-close-white" onClick={closeModal}></button>
+                <h5 className="modal-title">
+                  {editIndex !== null ? "Edit Book" : "Add Book"}
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close btn-close-white"
+                  onClick={closeModal}
+                ></button>
               </div>
               <form onSubmit={handleSubmit}>
                 <div className="modal-body row g-3">
@@ -306,14 +393,22 @@ export default function ManageBooks() {
                       required={!formData.fileURL}
                     />
                     {formData.fileName && (
-                      <small className="text-muted">Uploaded: {formData.fileName}</small>
+                      <small className="text-muted">
+                        Uploaded: {formData.fileName}
+                      </small>
                     )}
                   </div>
                 </div>
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={closeModal}>Cancel</button>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={closeModal}
+                  >
+                    Cancel
+                  </button>
                   <button type="submit" className="btn btn-primary">
-                    {editIndex !== null ? 'Update Book' : 'Add Book'}
+                    {editIndex !== null ? "Update Book" : "Add Book"}
                   </button>
                 </div>
               </form>
@@ -324,16 +419,32 @@ export default function ManageBooks() {
 
       {/* Delete Confirmation Modal */}
       {showConfirm && (
-        <div className="modal d-block fade show animate__animated animate__fadeIn" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}>
+        <div
+          className="modal d-block fade show animate__animated animate__fadeIn"
+          tabIndex="-1"
+          style={{ backgroundColor: "rgba(0,0,0,0.7)" }}
+        >
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content bg-dark text-white">
               <div className="modal-header">
                 <h5 className="modal-title">Confirm Deletion</h5>
               </div>
-              <div className="modal-body">Are you sure you want to delete this book?</div>
+              <div className="modal-body">
+                Are you sure you want to delete this book?
+              </div>
               <div className="modal-footer">
-                <button className="btn btn-secondary" onClick={() => setShowConfirm(false)}>Cancel</button>
-                <button className="btn btn-danger" onClick={handleDeleteConfirmed}>Yes, Delete</button>
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => setShowConfirm(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="btn btn-danger"
+                  onClick={handleDeleteConfirmed}
+                >
+                  Yes, Delete
+                </button>
               </div>
             </div>
           </div>

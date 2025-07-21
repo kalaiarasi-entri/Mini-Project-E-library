@@ -104,7 +104,6 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
-
         {/* Faculty Routes */}
         <Route
           path="/faculty-dashboard"

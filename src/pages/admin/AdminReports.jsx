@@ -116,60 +116,44 @@ export default function AdminReports() {
       {/* Flip Cards */}
       <div className="row g-4 mt-4">
         {visibleUsers.map((user, idx) => (
-          <div key={idx} className="col-md-4">
-            <div className="flip-card shadow">
+          <div key={idx} className="col-md-4 mb-4">
+            <div className="flip-card">
               <div className="flip-card-inner">
-                <div className="flip-card-front d-flex flex-column justify-content-center align-items-center">
-                  <h5 className="fw-bold text-white text-capitalize mt-2 py-2 border-bottom border-secondary">
-                    {user.username}
-                  </h5>
-                  <div className="mt-2 animate__animated animate__pulse">
-                    <div className="p-3 text-white">
-                      <div className="mb-3 d-flex align-items-center">
-                        <i className="bi bi-envelope-fill me-2 text-info"></i>
-                        <span>
-                          <strong>Email:</strong> {user.email}
-                        </span>
-                      </div>
-                      <div className="mb-3 d-flex align-items-center">
-                        <i className="bi bi-building me-2 text-warning"></i>
-                        <span>
-                          <strong>Department:</strong>{" "}
-                          <span className="badge bg-primary bg-opacity-75 text-light px-2 py-1 rounded-pill">
-                            {user.department}
-                          </span>
-                        </span>
-                      </div>
-
-                      <div className="d-flex align-items-center">
-                        <i className="bi bi-journal-bookmark-fill me-2 text-success"></i>
-                        <span>
-                          <strong>Books Count:</strong>{" "}
-                          <span className="text-white fw-bold">
-                            {borrowCount(user)}
-                          </span>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <p
-                    className="text-white small mt-2 animate__animated animate__tada  animate__infinite"
-                    style={{ animationDuration: "3s" }}
-                  >
-                    Hover to flip →
-                  </p>
-                </div>
-                <div className="flip-card-back card border-secondary shadow d-flex align-items-center justify-content-center">
+                {/* Front */}
+                <div className="flip-card-front">
                   <div>
-                    <p className="fw-bold">View Borrow History</p>
-                    <button
-                      className="btn btn-primary rounded-pill"
-                      onClick={() => setSelectedUser(user)}
-                    >
-                      <Eye size={16} className="me-1" />
-                      View Details
-                    </button>
+                    <h5 className="text-uppercase">{user.username}</h5>
+
+                    <div className="info">
+                      <div className="mb-2">
+                        <i className="bi bi-envelope-fill text-info me-2"></i>
+                        {user.email}
+                      </div>
+                      <div className="mb-2">
+                        <i className="bi bi-building text-warning me-2"></i>
+                        <strong>Dept:</strong>{" "}
+                        <span className="badge bg-secondary text-light">
+                          {user.department}
+                        </span>
+                      </div>
+                      <div>
+                        <i className="bi bi-journal-bookmark-fill text-success me-2"></i>
+                        <strong>Books:</strong> {borrowCount(user)}
+                      </div>
+                    </div> 
+                  </div>
+                  <div className="hover-hint mt-0">⟶ Hover to flip</div>
+                </div>
+
+                {/* Back */}
+                <div className="flip-card-back">
+                  <h6 className="fw-semibold mb-4">Borrow History</h6>
+                  <div
+                    className="position-absolute bottom-2 end-2 p-2 rounded-circle bg-light bg-opacity-10 mt-5"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => setSelectedUser(user)}
+                  >
+                    <Eye size={20} className="text-white" />
                   </div>
                 </div>
               </div>

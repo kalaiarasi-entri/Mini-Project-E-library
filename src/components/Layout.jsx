@@ -31,8 +31,8 @@ export default function Layout() {
     dispatch(logout());
     navigate("/");
        toast.info(`Logged out succesfully`, {
-            position: "top-left",
-            autoClose: 3000,
+            position: "top-right",
+            autoClose: 2000,
             hideProgressBar: false,
             closeOnClick: false,
             pauseOnHover: true,

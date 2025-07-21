@@ -32,8 +32,8 @@ export default function Login() {
     if (matchedUser) {
       dispatch(login(matchedUser));
       toast.success(`Logged in as ${userRole}`, {
-        position: "top-left",
-        autoClose: 3000,
+        position: "top-right",
+        autoClose: 2000,
         hideProgressBar: false,
         closeOnClick: false,
         pauseOnHover: true,
@@ -66,8 +66,8 @@ export default function Login() {
       }, 800);
     } else {
       toast.error("Invalid credentials or user not found", {
-        position: "top-left",
-        autoClose: 3000,
+        position: "top-right",
+        autoClose: 2000,
         hideProgressBar: false,
         closeOnClick: false,
         pauseOnHover: true,

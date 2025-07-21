@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Eye, Pencil, Trash, Plus } from "lucide-react";
+import { Eye, Pencil, Trash, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { Modal, Button, Form } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -17,6 +17,14 @@ export default function ManageUsers() {
   const [editMode, setEditMode] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
+  //   pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 5;
+
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
 
   const [formData, setFormData] = useState({
     userId: "",
@@ -24,7 +32,7 @@ export default function ManageUsers() {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "student",
+    role: "",
     department: "",
   });
 
@@ -39,7 +47,9 @@ export default function ManageUsers() {
     });
     //show without current user
     const currentUser = JSON.parse(localStorage.getItem("user"));
-    const filtered = merged.filter((user) => user.userId !== currentUser?.userId);
+    const filtered = merged.filter(
+      (user) => user.userId !== currentUser?.userId
+    );
     setUsers(filtered);
   }, []);
 
@@ -71,7 +81,7 @@ export default function ManageUsers() {
       email: "",
       password: "",
       confirmPassword: "",
-      role: "student",
+      role: "",
       department: "",
     });
     setEditMode(false);
@@ -91,7 +101,17 @@ export default function ManageUsers() {
     const updated = users.filter((u) => u.userId !== userToDelete.userId);
     updateLocalStorage(updated);
     setUsers(updated);
-    toast.success("User deleted successfully");
+    toast.success(`user deleted succesfully`, {
+      position: "top-right",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+      // transition: Bounce,
+    });
     setShowDeleteConfirm(false);
   };
 
@@ -103,7 +123,17 @@ export default function ManageUsers() {
     updateLocalStorage(updatedUsers);
     setUsers(updatedUsers);
     setShowFormModal(false);
-    toast.success(editMode ? "User updated" : "User added");
+    toast.success(`user added succesfully`, {
+      position: "top-right",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+      // transition: Bounce,
+    });
   };
 
   const updateLocalStorage = (updated) => {
@@ -117,7 +147,6 @@ export default function ManageUsers() {
 
   return (
     <div className="container mt-4 text-white animate__animated animate__fadeIn">
-      <h3 className="text-white mb-4">Manage Users</h3>
       <ToastContainer theme="dark" />
       <div className="d-flex justify-content-between align-items-center mb-4">
         <button className="btn btn-success" onClick={handleAddUser}>
@@ -190,10 +219,10 @@ export default function ManageUsers() {
             </tr>
           </thead>
           <tbody>
-            {filteredUsers.length > 0 ? (
-              filteredUsers.map((user, index) => (
-                <tr key={user.userId}>
-                  <td>{index + 1}</td>
+            {currentUsers.length > 0 ? (
+              currentUsers.map((user, index) => (
+                <tr key={user.userId} className="animate__animated animate__fadeInUp">
+                  <td>{indexOfFirstUser + index + 1}</td>
                   <td>{user.username}</td>
                   <td>{user.email}</td>
                   <td>{user.role}</td>
@@ -234,6 +263,44 @@ export default function ManageUsers() {
             )}
           </tbody>
         </table>
+        <div className="d-flex justify-content-center mt-4">
+  <nav>
+    <ul className="pagination pagination-sm mb-0">
+      <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+        <button
+          className="page-link bg-dark text-white border-secondary"
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+        >
+          <ChevronLeft size={16} />
+        </button>
+      </li>
+
+      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+        <li
+          key={page}
+          className={`page-item ${page === currentPage ? 'active' : ''}`}
+        >
+          <button
+            className="page-link bg-dark text-white border-secondary"
+            onClick={() => setCurrentPage(page)}
+          >
+            {page}
+          </button>
+        </li>
+      ))}
+
+      <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+        <button
+          className="page-link bg-dark text-white border-secondary"
+          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+        >
+          <ChevronRight size={16} />
+        </button>
+      </li>
+    </ul>
+  </nav>
+</div>
+
       </div>
 
       {/* View Modal */}
@@ -243,7 +310,11 @@ export default function ManageUsers() {
         centered
         className="animate__animated animate__fadeInDown"
       >
-        <Modal.Header closeButton className="bg-dark text-white"  closeVariant="white">
+        <Modal.Header
+          closeButton
+          className="bg-dark text-white"
+          closeVariant="white"
+        >
           <Modal.Title>User Details</Modal.Title>
         </Modal.Header>
         <Modal.Body className="bg-dark text-white">
@@ -276,9 +347,14 @@ export default function ManageUsers() {
         show={showFormModal}
         onHide={() => setShowFormModal(false)}
         centered
+        scrollable
         className="animate__animated animate__zoomIn"
       >
-        <Modal.Header closeButton className="bg-dark text-white" closeVariant="white">
+        <Modal.Header
+          closeButton
+          className="bg-dark text-white"
+          closeVariant="white"
+        >
           <Modal.Title>{editMode ? "Edit User" : "Add User"}</Modal.Title>
         </Modal.Header>
         <Modal.Body className="bg-dark text-white">
@@ -329,10 +405,11 @@ export default function ManageUsers() {
                 value={formData.role}
                 onChange={handleFormChange}
               >
-                <option value="student">Student</option>
+                <option value="">Select Role</option>
+                <option value="admin">Admin</option>
                 <option value="faculty">Faculty</option>
                 <option value="librarian">Librarian</option>
-                <option value="admin">Admin</option>
+                <option value="student">Student</option>
               </Form.Select>
             </Form.Group>
             {formData.role === "student" && (
