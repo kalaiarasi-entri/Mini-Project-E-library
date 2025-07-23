@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ApexCharts from "react-apexcharts";
 import { Users, GraduationCap, BookOpen, Archive } from "lucide-react";
+import CountUp from "react-countup";
 import "animate.css";
 
 const chartColors = [
@@ -17,6 +19,8 @@ export default function AdminDashboard() {
   const [allUsers, setAllUsers] = useState([]);
   const [borrowData, setBorrowData] = useState([]);
   const [bookData, setBookData] = useState([]);
+  const navigate = useNavigate();
+  const [animateCounts, setAnimateCounts] = useState(false);
 
   useEffect(() => {
     const storedUsers = localStorage.getItem("usersByRole");
@@ -31,6 +35,14 @@ export default function AdminDashboard() {
 
     const books = JSON.parse(localStorage.getItem("books")) || [];
     setBookData(books);
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnimateCounts(true);
+    }, 1000); // Wait 800ms for card animations to finish
+
+    return () => clearTimeout(timer);
   }, []);
 
   const roles = ["admin", "librarian", "faculty", "student"];
@@ -109,65 +121,95 @@ export default function AdminDashboard() {
     dataLabels: { enabled: true },
   };
 
+  const dashboardCards = [
+    {
+      label: "Total Users",
+      count: allUsers.length,
+      icon: <Users size={30} className="text-white" />,
+      gradient: "linear-gradient(135deg, #4e79a7, #283e6e)",
+      link: "/users",
+    },
+    {
+      label: "Total Students",
+      count: studentList.length,
+      icon: <GraduationCap size={30} className="text-white" />,
+      gradient: "linear-gradient(135deg, #59a14f, #2d6b34)",
+      link: "/student-reports",
+    },
+    {
+      label: "Total Books",
+      count: bookData.length,
+      icon: <BookOpen size={30} className="text-white" />,
+      gradient: "linear-gradient(135deg, #f28e2b, #a95f17)",
+      link: "/books",
+    },
+    {
+      label: "Borrow Requests",
+      count: borrowData.length,
+      icon: <Archive size={30} className="text-white" />,
+      gradient: "linear-gradient(135deg, #e15759, #a13a3c)",
+      link: "/student-reports",
+    },
+  ];
+
   return (
     <div className="container mt-4 text-white">
-      <h3 className="mb-4 animate__animated animate__fadeInDown">
-        Admin Dashboard
-      </h3>
       <div className="row g-4">
-         <div className="row g-4 mb-4">
-  {/* Total Users */}
-  <div className="col-md-3">
-    <div className="card p-4 shadow-lg rounded-4 border-0 text-white animate__animated animate__fadeInUp" style={{ background: "linear-gradient(135deg, #4e79a7, #283e6e)" }}>
-      <div className="d-flex align-items-center justify-content-between">
-        <div>
-          <div className="text-uppercase fw-semibold small">Total Users</div>
-          <div className="fs-3 fw-bold">{allUsers.length}</div>
-        </div>
-        <Users size={36} className="opacity-75" />
-      </div>
-    </div>
-  </div>
+        <div className="row g-4 mb-4  animate__animated animate__fadeInRight">
+          {dashboardCards.map((card, idx) => (
+            <div className="col-md-3" key={idx}>
+              <div
+                className="card text-white"
+                style={{
+                  background: card.gradient,
+                  animationDelay: `${idx * 0.2}s`,
+                  cursor: "pointer",
+                  borderRadius: "1.2rem",
+                  minHeight: "150px",
+                  transition: "transform 0.3s ease",
+                }}
+                onClick={() => navigate(card.link)}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.transform = "scale(1.03)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.transform = "scale(1)")
+                }
+              >
+                {/* Card content wrapper */}
+                <div className="d-flex flex-column h-100 p-4">
+                  {/* Header (icon + label) */}
+                  <div className="d-flex align-items-center gap-2 mb-3">
+                    <div
+                      className="d-flex align-items-center justify-content-center"
+                      style={{
+                        backgroundColor: "rgba(255,255,255,0.15)",
+                        borderRadius: "50%",
+                        padding: "8px",
+                      }}
+                    >
+                      {card.icon}
+                    </div>
+                    <div className="fw-semibold text-uppercase small">
+                      {card.label}
+                    </div>
+                  </div>
 
-  {/* Total Students */}
-  <div className="col-md-3">
-    <div className="card p-4 shadow-lg rounded-4 border-0 text-white animate__animated animate__fadeInUp animate__delay-1s" style={{ background: "linear-gradient(135deg, #59a14f, #2d6b34)" }}>
-      <div className="d-flex align-items-center justify-content-between">
-        <div>
-          <div className="text-uppercase fw-semibold small">Total Students</div>
-          <div className="fs-3 fw-bold">{studentList.length}</div>
+                  {/* Centered Count in remaining space */}
+                  <div className="flex-grow-1 d-flex justify-content-center align-items-center">
+                    <div className="fs-2 fw-bold text-center">
+                      {animateCounts ? (
+                        <CountUp end={card.count} duration={2.5} />
+                      ) : (
+                        0
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
-        <GraduationCap size={36} className="opacity-75" />
-      </div>
-    </div>
-  </div>
-
-  {/* Total Books */}
-  <div className="col-md-3">
-    <div className="card p-4 shadow-lg rounded-4 border-0 text-white animate__animated animate__fadeInUp animate__delay-2s" style={{ background: "linear-gradient(135deg, #f28e2b, #a95f17)" }}>
-      <div className="d-flex align-items-center justify-content-between">
-        <div>
-          <div className="text-uppercase fw-semibold small">Total Books</div>
-          <div className="fs-3 fw-bold">{bookData.length}</div>
-        </div>
-        <BookOpen size={36} className="opacity-75" />
-      </div>
-    </div>
-  </div>
-
-  {/* Borrow Requests */}
-  <div className="col-md-3">
-    <div className="card p-4 shadow-lg rounded-4 border-0 text-white animate__animated animate__fadeInUp animate__delay-3s" style={{ background: "linear-gradient(135deg, #e15759, #a13a3c)" }}>
-      <div className="d-flex align-items-center justify-content-between">
-        <div>
-          <div className="text-uppercase fw-semibold small">Borrow Requests</div>
-          <div className="fs-3 fw-bold">{borrowData.length}</div>
-        </div>
-        <Archive size={36} className="opacity-75" />
-      </div>
-    </div>
-  </div>
-</div>
 
         {/* Users by Role - PIE chart */}
         <div className="col-md-6">
