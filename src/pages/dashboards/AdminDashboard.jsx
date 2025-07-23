@@ -1,8 +1,17 @@
 import React, { useEffect, useState } from "react";
 import ApexCharts from "react-apexcharts";
+import { Users, GraduationCap, BookOpen, Archive } from "lucide-react";
 import "animate.css";
 
-const chartColors = ["#4e79a7", "#f28e2b", "#e15759", "#76b7b2", "#59a14f", "#edc949", "#af7aa1"];
+const chartColors = [
+  "#4e79a7",
+  "#f28e2b",
+  "#e15759",
+  "#76b7b2",
+  "#59a14f",
+  "#edc949",
+  "#af7aa1",
+];
 
 export default function AdminDashboard() {
   const [allUsers, setAllUsers] = useState([]);
@@ -54,7 +63,8 @@ export default function AdminDashboard() {
   const studentBorrowMap = {};
   borrowData.forEach((req) => {
     if (req.status === "Borrowed" || req.status === "Returned") {
-      studentBorrowMap[req.studentId] = (studentBorrowMap[req.studentId] || 0) + 1;
+      studentBorrowMap[req.studentId] =
+        (studentBorrowMap[req.studentId] || 0) + 1;
     }
   });
   const topBorrowers = Object.entries(studentBorrowMap)
@@ -101,21 +111,83 @@ export default function AdminDashboard() {
 
   return (
     <div className="container mt-4 text-white">
-      <h3 className="mb-4 animate__animated animate__fadeInDown">Admin Dashboard</h3>
+      <h3 className="mb-4 animate__animated animate__fadeInDown">
+        Admin Dashboard
+      </h3>
       <div className="row g-4">
+         <div className="row g-4 mb-4">
+  {/* Total Users */}
+  <div className="col-md-3">
+    <div className="card p-4 shadow-lg rounded-4 border-0 text-white animate__animated animate__fadeInUp" style={{ background: "linear-gradient(135deg, #4e79a7, #283e6e)" }}>
+      <div className="d-flex align-items-center justify-content-between">
+        <div>
+          <div className="text-uppercase fw-semibold small">Total Users</div>
+          <div className="fs-3 fw-bold">{allUsers.length}</div>
+        </div>
+        <Users size={36} className="opacity-75" />
+      </div>
+    </div>
+  </div>
+
+  {/* Total Students */}
+  <div className="col-md-3">
+    <div className="card p-4 shadow-lg rounded-4 border-0 text-white animate__animated animate__fadeInUp animate__delay-1s" style={{ background: "linear-gradient(135deg, #59a14f, #2d6b34)" }}>
+      <div className="d-flex align-items-center justify-content-between">
+        <div>
+          <div className="text-uppercase fw-semibold small">Total Students</div>
+          <div className="fs-3 fw-bold">{studentList.length}</div>
+        </div>
+        <GraduationCap size={36} className="opacity-75" />
+      </div>
+    </div>
+  </div>
+
+  {/* Total Books */}
+  <div className="col-md-3">
+    <div className="card p-4 shadow-lg rounded-4 border-0 text-white animate__animated animate__fadeInUp animate__delay-2s" style={{ background: "linear-gradient(135deg, #f28e2b, #a95f17)" }}>
+      <div className="d-flex align-items-center justify-content-between">
+        <div>
+          <div className="text-uppercase fw-semibold small">Total Books</div>
+          <div className="fs-3 fw-bold">{bookData.length}</div>
+        </div>
+        <BookOpen size={36} className="opacity-75" />
+      </div>
+    </div>
+  </div>
+
+  {/* Borrow Requests */}
+  <div className="col-md-3">
+    <div className="card p-4 shadow-lg rounded-4 border-0 text-white animate__animated animate__fadeInUp animate__delay-3s" style={{ background: "linear-gradient(135deg, #e15759, #a13a3c)" }}>
+      <div className="d-flex align-items-center justify-content-between">
+        <div>
+          <div className="text-uppercase fw-semibold small">Borrow Requests</div>
+          <div className="fs-3 fw-bold">{borrowData.length}</div>
+        </div>
+        <Archive size={36} className="opacity-75" />
+      </div>
+    </div>
+  </div>
+</div>
 
         {/* Users by Role - PIE chart */}
         <div className="col-md-6">
           <div className="card bg-dark p-3 shadow animate__animated animate__fadeInLeft">
             <h5 className="text-center mb-3 text-white">Users by Role</h5>
-            <ApexCharts options={pieOptions} series={roleCounts} type="pie" height={300} />
+            <ApexCharts
+              options={pieOptions}
+              series={roleCounts}
+              type="pie"
+              height={300}
+            />
           </div>
         </div>
 
         {/* Student Count by Department */}
         <div className="col-md-6">
           <div className="card bg-dark p-3 shadow animate__animated animate__fadeInRight">
-            <h5 className="text-center mb-3 text-white">Student Count by Department</h5>
+            <h5 className="text-center mb-3 text-white">
+              Student Count by Department
+            </h5>
             {departments.length > 0 ? (
               <ApexCharts
                 options={deptDonutOptions}
@@ -124,7 +196,9 @@ export default function AdminDashboard() {
                 height={300}
               />
             ) : (
-              <p className="text-center text-white">No student department data found</p>
+              <p className="text-center text-white">
+                No student department data found
+              </p>
             )}
           </div>
         </div>
@@ -136,7 +210,9 @@ export default function AdminDashboard() {
             {topBooks.length > 0 ? (
               <ApexCharts
                 options={barOptions}
-                series={[{ name: "Borrow Count", data: topBooks.map((b) => b.count) }]}
+                series={[
+                  { name: "Borrow Count", data: topBooks.map((b) => b.count) },
+                ]}
                 type="bar"
                 height={300}
               />
@@ -149,20 +225,25 @@ export default function AdminDashboard() {
         {/* Students Who Borrowed Most */}
         <div className="col-md-6">
           <div className="card bg-dark p-3 shadow animate__animated animate__fadeInUp">
-            <h5 className="text-center mb-3 text-white">Top Borrowing Students</h5>
+            <h5 className="text-center mb-3 text-white">
+              Top Borrowing Students
+            </h5>
             {topBorrowers.length > 0 ? (
               <ApexCharts
                 options={studentBarOptions}
-                series={[{ name: "Borrowed", data: topBorrowers.map((s) => s.count) }]}
+                series={[
+                  { name: "Borrowed", data: topBorrowers.map((s) => s.count) },
+                ]}
                 type="bar"
                 height={300}
               />
             ) : (
-              <p className="text-center text-white">No student borrow data available</p>
+              <p className="text-center text-white">
+                No student borrow data available
+              </p>
             )}
           </div>
         </div>
-
       </div>
     </div>
   );

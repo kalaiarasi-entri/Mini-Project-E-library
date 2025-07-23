@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Eye, Pencil, Trash, Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Eye,
+  Pencil,
+  Trash,
+  Plus,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { Modal, Button, Form } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -25,6 +32,7 @@ export default function ManageUsers() {
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
   const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+  const [formValidated, setFormValidated] = useState(false);
 
   const [formData, setFormData] = useState({
     userId: "",
@@ -35,6 +43,17 @@ export default function ManageUsers() {
     role: "",
     department: "",
   });
+
+  useEffect(() => {
+    if (showFormModal) {
+      document.body.classList.add("modal-open");
+    } else {
+      document.body.classList.remove("modal-open");
+    }
+    return () => {
+      document.body.classList.remove("modal-open");
+    };
+  }, [showFormModal]);
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("usersByRole")) || {};
@@ -115,7 +134,16 @@ export default function ManageUsers() {
     setShowDeleteConfirm(false);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    if (
+      form.checkValidity() === false ||
+      formData.password !== formData.confirmPassword
+    ) {
+      setFormValidated(true);
+      return;
+    }
     const updatedUsers = editMode
       ? users.map((u) => (u.userId === formData.userId ? formData : u))
       : [...users, formData];
@@ -221,7 +249,10 @@ export default function ManageUsers() {
           <tbody>
             {currentUsers.length > 0 ? (
               currentUsers.map((user, index) => (
-                <tr key={user.userId} className="animate__animated animate__fadeInUp">
+                <tr
+                  key={user.userId}
+                  className="animate__animated animate__fadeInUp"
+                >
                   <td>{indexOfFirstUser + index + 1}</td>
                   <td>{user.username}</td>
                   <td>{user.email}</td>
@@ -264,43 +295,56 @@ export default function ManageUsers() {
           </tbody>
         </table>
         <div className="d-flex justify-content-center mt-4">
-  <nav>
-    <ul className="pagination pagination-sm mb-0">
-      <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-        <button
-          className="page-link bg-dark text-white border-secondary"
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-        >
-          <ChevronLeft size={16} />
-        </button>
-      </li>
+          <nav>
+            <ul className="pagination pagination-sm mb-0">
+              <li
+                className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+              >
+                <button
+                  className="page-link bg-dark text-white border-secondary"
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                >
+                  <ChevronLeft size={16} />
+                </button>
+              </li>
 
-      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-        <li
-          key={page}
-          className={`page-item ${page === currentPage ? 'active' : ''}`}
-        >
-          <button
-            className="page-link bg-dark text-white border-secondary"
-            onClick={() => setCurrentPage(page)}
-          >
-            {page}
-          </button>
-        </li>
-      ))}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <li
+                    key={page}
+                    className={`page-item ${
+                      page === currentPage ? "active" : ""
+                    }`}
+                  >
+                    <button
+                      className="page-link bg-dark text-white border-secondary"
+                      onClick={() => setCurrentPage(page)}
+                    >
+                      {page}
+                    </button>
+                  </li>
+                )
+              )}
 
-      <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-        <button
-          className="page-link bg-dark text-white border-secondary"
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-        >
-          <ChevronRight size={16} />
-        </button>
-      </li>
-    </ul>
-  </nav>
-</div>
-
+              <li
+                className={`page-item ${
+                  currentPage === totalPages ? "disabled" : ""
+                }`}
+              >
+                <button
+                  className="page-link bg-dark text-white border-secondary"
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
       </div>
 
       {/* View Modal */}
@@ -348,6 +392,7 @@ export default function ManageUsers() {
         onHide={() => setShowFormModal(false)}
         centered
         scrollable
+        enforceFocus={false} // ✅ Important fix
         className="animate__animated animate__zoomIn"
       >
         <Modal.Header
@@ -358,7 +403,7 @@ export default function ManageUsers() {
           <Modal.Title>{editMode ? "Edit User" : "Add User"}</Modal.Title>
         </Modal.Header>
         <Modal.Body className="bg-dark text-white">
-          <Form>
+          <Form noValidate validated={formValidated} onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
               <Form.Label>Name</Form.Label>
               <Form.Control
@@ -366,8 +411,14 @@ export default function ManageUsers() {
                 value={formData.username}
                 onChange={handleFormChange}
                 placeholder="Enter name"
+                required
+                pattern="^[a-zA-Z ]{3,}$"
               />
+              <Form.Control.Feedback type="invalid">
+                Name must be at least 3 letters and contain only alphabets.
+              </Form.Control.Feedback>
             </Form.Group>
+
             <Form.Group className="mb-3">
               <Form.Label>Email</Form.Label>
               <Form.Control
@@ -376,8 +427,13 @@ export default function ManageUsers() {
                 onChange={handleFormChange}
                 type="email"
                 placeholder="Enter email"
+                required
               />
+              <Form.Control.Feedback type="invalid">
+                Please enter a valid email address.
+              </Form.Control.Feedback>
             </Form.Group>
+
             <Form.Group className="mb-3">
               <Form.Label>Password</Form.Label>
               <Form.Control
@@ -386,8 +442,15 @@ export default function ManageUsers() {
                 onChange={handleFormChange}
                 type="password"
                 placeholder="Enter password"
+                required
+                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}"
               />
+              <Form.Control.Feedback type="invalid">
+                Password must be at least 6 characters and include uppercase,
+                lowercase, and a number.
+              </Form.Control.Feedback>
             </Form.Group>
+
             <Form.Group className="mb-3">
               <Form.Label>Confirm Password</Form.Label>
               <Form.Control
@@ -396,14 +459,21 @@ export default function ManageUsers() {
                 onChange={handleFormChange}
                 type="password"
                 placeholder="Confirm password"
+                required
+                isInvalid={formData.confirmPassword !== formData.password}
               />
+              <Form.Control.Feedback type="invalid">
+                Passwords do not match.
+              </Form.Control.Feedback>
             </Form.Group>
+
             <Form.Group className="mb-3">
               <Form.Label>Role</Form.Label>
               <Form.Select
                 name="role"
                 value={formData.role}
                 onChange={handleFormChange}
+                required
               >
                 <option value="">Select Role</option>
                 <option value="admin">Admin</option>
@@ -411,7 +481,11 @@ export default function ManageUsers() {
                 <option value="librarian">Librarian</option>
                 <option value="student">Student</option>
               </Form.Select>
+              <Form.Control.Feedback type="invalid">
+                Please select a role.
+              </Form.Control.Feedback>
             </Form.Group>
+
             {formData.role === "student" && (
               <Form.Group className="mb-3">
                 <Form.Label>Department</Form.Label>
@@ -419,6 +493,7 @@ export default function ManageUsers() {
                   name="department"
                   value={formData.department}
                   onChange={handleFormChange}
+                  required
                 >
                   <option value="">Select Department</option>
                   <option value="Computer Science">Computer Science</option>
@@ -427,9 +502,13 @@ export default function ManageUsers() {
                   <option value="Civil">Civil</option>
                   <option value="IT">Information Technology</option>
                 </Form.Select>
+                <Form.Control.Feedback type="invalid">
+                  Please select a department.
+                </Form.Control.Feedback>
               </Form.Group>
             )}
-            <Button variant="success" onClick={handleSubmit}>
+
+            <Button variant="success" type="submit">
               {editMode ? "Update" : "Add"} User
             </Button>
           </Form>

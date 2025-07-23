@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import AppRoutes from "./routes/AppRoutes";
 import initialUsers from "./data/initialUsers.json";
 import { ToastContainer } from "react-toastify";
+import './App.css';
 import "react-toastify/dist/ReactToastify.css";
 
 function App() {

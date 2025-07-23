@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { toast } from "react-toastify";
 import 'animate.css'
 
 export default function Register() {
@@ -12,7 +13,17 @@ export default function Register() {
 
   const handleRegister = () => {
     if (password !== confirmPassword) {
-      alert('Passwords do not match')
+       toast.error(`password do not match`, {
+                  position: "top-right",
+                  autoClose: 2000,
+                  hideProgressBar: false,
+                  closeOnClick: false,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                  theme: "colored",
+                  // transition: Bounce,
+                });
       return
     }
 
@@ -25,7 +36,17 @@ export default function Register() {
 
     const isDuplicate = usersByRole.student.some((u) => u.email === email)
     if (isDuplicate) {
-      alert('Email already registered!')
+       toast.error(`Email Already Exists`, {
+                  position: "top-right",
+                  autoClose: 2000,
+                  hideProgressBar: false,
+                  closeOnClick: false,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                  theme: "colored",
+                  // transition: Bounce,
+                });
       return
     }
 
@@ -40,7 +61,17 @@ export default function Register() {
 
     usersByRole.student.push(newUser)
     localStorage.setItem('usersByRole', JSON.stringify(usersByRole))
-    alert('Registration successful!')
+     toast.success(`Registered successfully`, {
+                position: "top-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+                // transition: Bounce,
+              });
     navigate('/')
   }
 

@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Pencil, Trash2, Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Pencil,
+  Trash2,
+  Plus,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+} from "lucide-react";
 import "animate.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
@@ -24,14 +31,13 @@ export default function ManageBooks() {
   const [showModal, setShowModal] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(null);
-
+  const [viewBook, setViewBook] = useState(null);
   const currentUser = JSON.parse(localStorage.getItem("user"));
+  const ratings = JSON.parse(localStorage.getItem("bookRatings")) || [];
+  console.log("ratings", ratings);
 
-  //Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-
-  //const totalPages = Math.ceil(filtered.length / itemsPerPage);
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("books")) || [];
@@ -58,10 +64,7 @@ export default function ManageBooks() {
     if (bookId) {
       const index = books.findIndex((b) => b.bookId === bookId);
       const book = books[index];
-      setFormData({
-        ...book,
-        file: null,
-      });
+      setFormData({ ...book, file: null });
       setEditIndex(index);
     } else {
       resetForm();
@@ -97,10 +100,7 @@ export default function ManageBooks() {
         fileURL: URL.createObjectURL(file),
       }));
     } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -113,14 +113,12 @@ export default function ManageBooks() {
       createdBy: currentUser?.username || "Unknown",
       userId: currentUser?.userId,
     };
-
     const updated = [...books];
     if (editIndex !== null) {
       updated[editIndex] = book;
     } else {
       updated.push(book);
     }
-
     setBooks(updated);
     localStorage.setItem("books", JSON.stringify(updated));
     closeModal();
@@ -128,18 +126,26 @@ export default function ManageBooks() {
 
   const filtered = books
     .filter((b) =>
-      [b.title, b.author, b.type].some((field) =>
-        field.toLowerCase().includes(search.toLowerCase())
+      [b.title, b.author, b.type].some((f) =>
+        f.toLowerCase().includes(search.toLowerCase())
       )
     )
     .filter((b) => filterType === "All" || b.type === filterType)
     .sort((a, b) => {
       if (sortBy === "createdAt")
-        return new Date(b.createdAt) - new Date(a.createdAt); // newer first
+        return new Date(b.createdAt) - new Date(a.createdAt);
       return a[sortBy].localeCompare(b[sortBy]);
     });
 
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
+
+  //    Get student name by id for rating
+  const getStudentName = (studentId) => {
+    const users = JSON.parse(localStorage.getItem("usersByRole")) || {};
+    const students = users.student || [];
+    const student = students.find((s) => s.userId === studentId);
+    return student ? student.username : "Unknown Student";
+  };
 
   return (
     <div className="container mt-4 text-white animate__animated animate__fadeIn">
@@ -149,7 +155,6 @@ export default function ManageBooks() {
         </button>
       </div>
 
-      {/* Filters */}
       <div className="row mb-4 g-3">
         <div className="col-md-4">
           <div className="input-group">
@@ -165,7 +170,6 @@ export default function ManageBooks() {
             />
           </div>
         </div>
-
         <div className="col-md-4">
           <div className="input-group">
             <span className="input-group-text bg-secondary border-0 text-white">
@@ -182,7 +186,6 @@ export default function ManageBooks() {
             </select>
           </div>
         </div>
-
         <div className="col-md-4">
           <div className="input-group">
             <span className="input-group-text bg-secondary border-0 text-white">
@@ -202,7 +205,6 @@ export default function ManageBooks() {
         </div>
       </div>
 
-      {/* Books Table */}
       <table className="table table-dark table-striped table-bordered table-hover">
         <thead>
           <tr>
@@ -210,7 +212,6 @@ export default function ManageBooks() {
             <th>Title</th>
             <th>Type</th>
             <th>Author</th>
-            <th>Description</th>
             <th>File</th>
             <th>Created By</th>
             <th>Created At</th>
@@ -220,7 +221,7 @@ export default function ManageBooks() {
         <tbody>
           {filtered.length === 0 ? (
             <tr>
-              <td colSpan="9" className="text-center text-white">
+              <td colSpan="8" className="text-center text-white">
                 No records found
               </td>
             </tr>
@@ -239,7 +240,6 @@ export default function ManageBooks() {
                   <td>{b.title}</td>
                   <td>{b.type}</td>
                   <td>{b.author}</td>
-                  <td>{b.description}</td>
                   <td>
                     {b.fileURL ? (
                       <a href={b.fileURL} target="_blank" rel="noreferrer">
@@ -252,6 +252,12 @@ export default function ManageBooks() {
                   <td>{b.createdBy}</td>
                   <td>{new Date(b.createdAt).toLocaleDateString()}</td>
                   <td>
+                    <button
+                      className="btn btn-info btn-sm me-2"
+                      onClick={() => setViewBook(b)}
+                    >
+                      <Eye size={16} />
+                    </button>
                     <button
                       className="btn btn-primary btn-sm me-2"
                       onClick={() => openModal(b.bookId)}
@@ -274,6 +280,70 @@ export default function ManageBooks() {
           )}
         </tbody>
       </table>
+
+      {/* View Modal */}
+     {viewBook && (
+  <div
+    className="modal d-block fade show"
+    style={{ backgroundColor: "rgba(0,0,0,0.7)" }}
+  >
+    <div className="modal-dialog modal-lg modal-dialog-centered">
+      <div className="modal-content bg-dark text-white rounded-4 shadow-lg">
+        <div className="modal-header border-secondary">
+          <h5 className="modal-title fw-semibold">
+            📖 Book Details
+          </h5>
+          <button
+            type="button"
+            className="btn-close btn-close-white"
+            onClick={() => setViewBook(null)}
+          ></button>
+        </div>
+
+        <div className="modal-body scrollable-modal-body px-4">
+          <div className="mb-3">
+            <h5 className="text-info mb-1">{viewBook.title}</h5>
+            <p className="mb-1"><strong>Type:</strong> {viewBook.type}</p>
+            <p className="mb-1"><strong>Author:</strong> {viewBook.author}</p>
+            <p className="mb-1"><strong>Description:</strong> {viewBook.description}</p>
+          </div>
+
+          <hr className="border-secondary" />
+
+          <h6 className="text-warning mb-3">⭐ Ratings</h6>
+          {ratings.filter((r) => r.bookId === viewBook.bookId).length === 0 ? (
+            <p className="text-muted fst-italic">No ratings yet.</p>
+          ) : (
+            ratings
+              .filter((r) => r.bookId === viewBook.bookId)
+              .map((r, index) => (
+                <div key={index} className="mb-4 pb-3 border-bottom border-secondary">
+                  <p className="mb-1">
+                    <strong>👤 Name:</strong> {getStudentName(r.studentId)}
+                  </p>
+                  <div className="mb-1">
+                    <strong>Rating:</strong>{" "}
+                    <span className="text-warning">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <span key={star} style={{ fontSize: "1.25rem" }}>
+                          {star <= r.rating ? "★" : "☆"}
+                        </span>
+                      ))}
+                    </span>
+                  </div>
+                  <p className="fst-italic mb-0">
+                    <strong>📝 Comment:</strong> {r.comment}
+                  </p>
+                </div>
+              ))
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+
       {/* Pagination */}
       <div className="d-flex justify-content-center mt-4">
         <nav>
