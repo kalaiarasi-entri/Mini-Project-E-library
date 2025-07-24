@@ -11,9 +11,10 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  
+  const [loading, setLoading] = useState(false); // new state
 
   const handleLogin = () => {
+    setLoading(true); // disable the button
     const usersByRole = JSON.parse(localStorage.getItem("usersByRole")) || {};
     let matchedUser = null;
     let userRole = "";
@@ -76,6 +77,7 @@ export default function Login() {
         theme: "colored",
         // transition: Bounce,
       });
+      setLoading(false); // re-enable the button on error
     }
   };
 
@@ -84,7 +86,7 @@ export default function Login() {
       className="min-vh-100 d-flex align-items-center justify-content-center text-white"
       style={{
         backgroundImage:
-          "url(https://as1.ftcdn.net/v2/jpg/02/92/60/86/1000_F_292608623_FVzbEvQLqAdYZIL4yOXkzRYVS1191ls6.jpg)",
+          "url(https://thumbs.dreamstime.com/z/digital-library-online-education-concept-laptop-computer-colorful-books-d-rendering-digital-library-online-education-125338333.jpg?ct=jpeg)",
         backgroundSize: "cover",
         backgroundPosition: "center",
         position: "relative",
@@ -101,7 +103,7 @@ export default function Login() {
 
       <div className="container position-relative z-1 animate__animated animate__fadeIn">
         <div className="row justify-content-center text-center mb-5">
-          <h1 className="display-5 fw-bold">E-Library Management System</h1>
+          <h1 className="display-7 fw-bold">E-Library Management System</h1>
           <p className="lead text-light">
             Access. Organize. Learn - Anytime, Anywhere.
           </p>
@@ -114,7 +116,6 @@ export default function Login() {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  handleLogin();
                 }}
               >
                 <input
@@ -135,8 +136,8 @@ export default function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
-                <button type="submit" className="btn btn-primary w-100">
-                  Sign In
+                <button type="submit" className="btn btn-primary w-100"   onClick={handleLogin}  disabled={loading}>
+                   {loading ? "Logging in..." : " Sign In"}
                 </button>
               </form>
               <p className="mt-3 text-center">

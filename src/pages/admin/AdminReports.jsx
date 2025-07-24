@@ -166,7 +166,7 @@ export default function AdminReports() {
       {visibleCount < sorted.length && (
         <div className="text-center mt-4">
           <button
-            className="btn btn-outline-warning rounded-pill px-4"
+            className="btn btn-primary rounded-pill px-4"
             onClick={() => setVisibleCount(visibleCount + 6)}
           >
             Load More

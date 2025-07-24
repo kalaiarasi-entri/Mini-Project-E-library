@@ -17,6 +17,7 @@ import {
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "animate.css";
+import "./Sidebar.css";
 
 export default function Layout() {
   const user = useSelector((state) => state.auth.user);
@@ -30,17 +31,17 @@ export default function Layout() {
   const handleLogoutConfirm = () => {
     dispatch(logout());
     navigate("/");
-       toast.info(`Logged out succesfully`, {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
-           // transition: Bounce,
-          });
+    toast.info(`Logged out succesfully`, {
+      position: "top-right",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+      // transition: Bounce,
+    });
   };
 
   const getPageTitle = () => {
@@ -80,7 +81,7 @@ export default function Layout() {
         return (
           <BookOpen
             size={26}
-            className="text-success animate__animated animate__fadeInLeft"
+            className="text-primary animate__animated animate__fadeInLeft"
           />
         );
       case "Borrow Requests":
@@ -98,14 +99,14 @@ export default function Layout() {
             className="text-primary animate__animated animate__fadeInLeft"
           />
         );
-        case "Student Details":
+      case "Student Details":
         return (
           <User
             size={26}
             className="text-white animate__animated animate__fadeInLeft"
           />
         );
-        case "Student Reports":
+      case "Student Reports":
         return (
           <FileText
             size={26}
@@ -134,6 +135,11 @@ export default function Layout() {
       label: "Manage Users",
     },
     role === "admin" && {
+      path: "/books",
+      icon: <BookOpen size={18} />,
+      label: "Manage Books",
+    },
+    role === "admin" && {
       path: "/student-reports",
       icon: <FileText size={18} />,
       label: "Reports",
@@ -143,7 +149,7 @@ export default function Layout() {
       icon: <LayoutDashboard size={18} />,
       label: "Dashboard",
     },
-    ["admin", "librarian"].includes(role) && {
+    role === "librarian" && {
       path: "/books",
       icon: <BookOpen size={18} />,
       label: "Manage Books",
@@ -153,15 +159,20 @@ export default function Layout() {
       icon: <Library size={18} />,
       label: "Borrow Requests",
     },
-     role === "faculty" && {
+    role === "faculty" && {
       path: "/faculty-dashboard",
       icon: <LayoutDashboard size={18} />,
       label: "Dashboard",
     },
-     role === "faculty" && {
+    role === "faculty" && {
       path: "/students-details",
       icon: <Users size={18} />,
       label: "Students",
+    },
+    ["faculty"].includes(role) && {
+      path: "/books",
+      icon: <BookOpen size={18} />,
+      label: "Books",
     },
     role === "faculty" && {
       path: "/student-reports",
@@ -183,11 +194,11 @@ export default function Layout() {
       icon: <Library size={18} />,
       label: "Borrowed Books",
     },
-    role === "student" && {
-      path: "/profile",
-      icon: <User size={18} />,
-      label: "My Profile",
-    },
+    // role === "student" && {
+    //   path: "/profile",
+    //   icon: <User size={18} />,
+    //   label: "My Profile",
+    // },
     role === "guest" && {
       path: "/guest-dashboard",
       icon: <Search size={18} />,
@@ -205,30 +216,76 @@ export default function Layout() {
         className="bg-dark p-3 d-flex flex-column shadow animate__animated animate__fadeInLeft"
         style={{ width: "250px" }}
       >
-        <div className="d-flex align-items-center mb-4">
-          <img
-            src="https://cdn-icons-png.flaticon.com/512/1048/1048927.png"
-            alt="Logo"
-            width="30"
-            height="30"
-            className="me-2"
-            style={{ objectFit: "contain" }}
-          />
-          <h5 className="text-white mb-0">eLibrary</h5>
+        <div className="d-flex align-items-center gap-2 mb-4">
+          <svg
+            width="240"
+            height="70"
+            viewBox="0 0 500 120"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#00c6ff" />
+                <stop offset="100%" stopColor="#0072ff" />
+              </linearGradient>
+            </defs>
+
+            {/* Gradient rounded square with white "e" */}
+            <rect
+              x="10"
+              y="20"
+              width="70"
+              height="70"
+              rx="16"
+              fill="url(#blueGrad)"
+            />
+            <text
+              x="45"
+              y="78"
+              textAnchor="middle"
+              fontSize="68"
+              fontFamily="Poppins, sans-serif"
+              fill="white"
+              fontWeight="600"
+            >
+              e
+            </text>
+
+            {/* eLibrary text */}
+            <text
+              x="100"
+              y="70"
+              fontFamily="Poppins, sans-serif"
+              fontSize="62"
+              fontWeight="600"
+              fill="url(#blueGrad)"
+            >
+              eLibrary
+            </text>
+          </svg>
         </div>
 
         <ul className="nav flex-column mb-auto">
-          {menuItems.map((item, idx) => (
-            <li key={idx} className="mb-2 animate__animated animate__fadeInUp">
-              <Link
-                to={item.path}
-                className="nav-link text-white d-flex align-items-center gap-2"
+          {menuItems.map((item, idx) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <li
+                key={idx}
+                className="mb-2 animate__animated animate__fadeInUp"
               >
-                {item.icon}
-                <span>{item.label}</span>
-              </Link>
-            </li>
-          ))}
+                <Link
+                  to={item.path}
+                  className={`nav-link d-flex align-items-center gap-2 px-3 py-2 rounded sidebar-link ${
+                    isActive ? "active" : ""
+                  }`}
+                >
+                  {item.icon}
+                  <span>{item.label}</span>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
 
         <button
@@ -254,7 +311,7 @@ export default function Layout() {
           {/* Right Profile & Notifications */}
           <div className="d-flex justify-content-end align-items-center gap-4">
             <div className="position-relative animate__animated animate__heartBeat animate__slower">
-              <Bell size={22} className="text-warning" />
+              <Bell size={22} className="text-light" />
               <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                 3
               </span>
@@ -262,13 +319,13 @@ export default function Layout() {
 
             <div className="d-flex align-items-center gap-2">
               <img
-                src="https://randomuser.me/api/portraits/lego/1.jpg"
+                src="https://randomuser.me/api/portraits/women/1.jpg"
                 alt="Profile"
                 width="36"
                 height="36"
                 className="rounded-circle border border-light shadow-sm"
               />
-              <span className="fw-semibold text-white">
+              <span className="fw-semibold text-white text-capitalize">
                 {user?.username || "Guest"}
               </span>
             </div>

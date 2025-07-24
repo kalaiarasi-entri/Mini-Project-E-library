@@ -153,7 +153,7 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="container mt-4 text-white">
+    <div className="container  text-white">
       <div className="row g-4">
         <div className="row g-4 mb-4  animate__animated animate__fadeInRight">
           {dashboardCards.map((card, idx) => (

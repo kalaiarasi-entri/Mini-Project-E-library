@@ -6,10 +6,10 @@ import CountUp from "react-countup";
 import "animate.css";
 
 const chartColors = [
-  "#00b894",
+  "#4e79a7",
   "#e17055",
-  "#6c5ce7",
-  "#fab1a0",
+  "#00cec9",
+  "#59a14f",
   "#0984e3",
   "#ffeaa7",
 ];
@@ -56,7 +56,7 @@ export default function FacultyDashboard() {
       count: 5,
       icon: <BookOpen size={30} className="text-white" />,
       gradient: "linear-gradient(135deg, #59a14f, #2d6b34)",
-      link: "/books",
+      link: "/students-details",
     },
     {
       label: "Borrow Requests",

@@ -258,22 +258,29 @@ export default function ManageBooks() {
                     >
                       <Eye size={16} />
                     </button>
-                    <button
-                      className="btn btn-primary btn-sm me-2"
-                      onClick={() => openModal(b.bookId)}
-                    >
-                      <Pencil size={16} />
-                    </button>
-                    <button
-                      className="btn btn-danger btn-sm"
-                      onClick={() =>
-                        confirmDelete(
-                          books.findIndex((book) => book.bookId === b.bookId)
-                        )
-                      }
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    {currentUser.role !== "faculty" && (
+                      <>
+                        {" "}
+                        <button
+                          className="btn btn-primary btn-sm me-2"
+                          onClick={() => openModal(b.bookId)}
+                        >
+                          <Pencil size={16} />
+                        </button>
+                        <button
+                          className="btn btn-danger btn-sm"
+                          onClick={() =>
+                            confirmDelete(
+                              books.findIndex(
+                                (book) => book.bookId === b.bookId
+                              )
+                            )
+                          }
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </>
+                    )}
                   </td>
                 </tr>
               ))
@@ -282,67 +289,75 @@ export default function ManageBooks() {
       </table>
 
       {/* View Modal */}
-     {viewBook && (
-  <div
-    className="modal d-block fade show"
-    style={{ backgroundColor: "rgba(0,0,0,0.7)" }}
-  >
-    <div className="modal-dialog modal-lg modal-dialog-centered">
-      <div className="modal-content bg-dark text-white rounded-4 shadow-lg">
-        <div className="modal-header border-secondary">
-          <h5 className="modal-title fw-semibold">
-            📖 Book Details
-          </h5>
-          <button
-            type="button"
-            className="btn-close btn-close-white"
-            onClick={() => setViewBook(null)}
-          ></button>
-        </div>
+      {viewBook && (
+        <div
+          className="modal d-block fade show"
+          style={{ backgroundColor: "rgba(0,0,0,0.7)" }}
+        >
+          <div className="modal-dialog modal-lg modal-dialog-centered">
+            <div className="modal-content bg-dark text-white rounded-4 shadow-lg">
+              <div className="modal-header border-secondary">
+                <h5 className="modal-title fw-semibold text-capitalize">📖 {viewBook.title}</h5>
+                <button
+                  type="button"
+                  className="btn-close btn-close-white"
+                  onClick={() => setViewBook(null)}
+                ></button>
+              </div>
 
-        <div className="modal-body scrollable-modal-body px-4">
-          <div className="mb-3">
-            <h5 className="text-info mb-1">{viewBook.title}</h5>
-            <p className="mb-1"><strong>Type:</strong> {viewBook.type}</p>
-            <p className="mb-1"><strong>Author:</strong> {viewBook.author}</p>
-            <p className="mb-1"><strong>Description:</strong> {viewBook.description}</p>
-          </div>
-
-          <hr className="border-secondary" />
-
-          <h6 className="text-warning mb-3">⭐ Ratings</h6>
-          {ratings.filter((r) => r.bookId === viewBook.bookId).length === 0 ? (
-            <p className="text-muted fst-italic">No ratings yet.</p>
-          ) : (
-            ratings
-              .filter((r) => r.bookId === viewBook.bookId)
-              .map((r, index) => (
-                <div key={index} className="mb-4 pb-3 border-bottom border-secondary">
+              <div className="modal-body scrollable-modal-body px-4">
+                <div className="mb-3">
+                  {/* <h5 className="text-info mb-1 text-capitalize">Book:{viewBook.title}</h5> */}
                   <p className="mb-1">
-                    <strong>👤 Name:</strong> {getStudentName(r.studentId)}
+                    <strong>Type:</strong> {viewBook.type}
                   </p>
-                  <div className="mb-1">
-                    <strong>Rating:</strong>{" "}
-                    <span className="text-warning">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <span key={star} style={{ fontSize: "1.25rem" }}>
-                          {star <= r.rating ? "★" : "☆"}
-                        </span>
-                      ))}
-                    </span>
-                  </div>
-                  <p className="fst-italic mb-0">
-                    <strong>📝 Comment:</strong> {r.comment}
+                  <p className="mb-1">
+                    <strong>Author:</strong> {viewBook.author}
+                  </p>
+                  <p className="mb-1">
+                    <strong>Description:</strong> {viewBook.description}
                   </p>
                 </div>
-              ))
-          )}
-        </div>
-      </div>
-    </div>
-  </div>
-)}
 
+                <hr className="border-secondary" />
+
+                <h6 className="text-warning mb-3">⭐ Ratings</h6>
+                {ratings.filter((r) => r.bookId === viewBook.bookId).length ===
+                0 ? (
+                  <p className="text-white fst-italic">No ratings yet.</p>
+                ) : (
+                  ratings
+                    .filter((r) => r.bookId === viewBook.bookId)
+                    .map((r, index) => (
+                      <div
+                        key={index}
+                        className="mb-4 pb-3 border-bottom border-secondary"
+                      >
+                        <p className="mb-1">
+                          <strong>👤 Name:</strong>{" "}
+                          <span>{getStudentName(r.studentId)}</span>
+                        </p>
+                        <div className="mb-1">
+                          <strong>👍 Rating:</strong>{" "}
+                          <span className="text-warning">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <span key={star} style={{ fontSize: "1.25rem" }}>
+                                {star <= r.rating ? "★" : "☆"}
+                              </span>
+                            ))}
+                          </span>
+                        </div>
+                        <p className="fst-italic mb-0">
+                          <strong>📝 Comment:</strong> {r.comment}
+                        </p>
+                      </div>
+                    ))
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Pagination */}
       <div className="d-flex justify-content-center mt-4">

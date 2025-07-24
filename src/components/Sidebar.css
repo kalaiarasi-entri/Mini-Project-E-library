@@ -7,3 +7,38 @@
   background-color: #333;
   color: white;
 }
+
+.sidebar-link {
+  color: #ffffff !important;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.sidebar-link.active,
+.sidebar-link.active * {
+  color: #fff !important;
+}
+
+.sidebar-link.active {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-left: 4px solid #0dcaf0;
+  color: #fff;
+  font-weight: 500;
+  animation: slideIn 0.3s ease-in-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* logo */
+svg text {
+  letter-spacing: 0.5px;
+}

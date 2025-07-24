@@ -65,7 +65,7 @@ export default function AppRoutes() {
         <Route
           path="/books"
           element={
-            <ProtectedRoute allowedRoles={["librarian","admin"]}>
+            <ProtectedRoute allowedRoles={["librarian","admin","faculty"]}>
               <ManageBooks />
             </ProtectedRoute>
           }
