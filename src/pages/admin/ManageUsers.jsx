@@ -44,16 +44,16 @@ export default function ManageUsers() {
     department: "",
   });
 
-  useEffect(() => {
-    if (showFormModal) {
-      document.body.classList.add("modal-open");
-    } else {
-      document.body.classList.remove("modal-open");
-    }
-    return () => {
-      document.body.classList.remove("modal-open");
-    };
-  }, [showFormModal]);
+  //   useEffect(() => {
+  //     if (showFormModal) {
+  //       document.body.classList.add("modal-open");
+  //     } else {
+  //       document.body.classList.remove("modal-open");
+  //     }
+  //     return () => {
+  //       document.body.classList.remove("modal-open");
+  //     };
+  //   }, [showFormModal]);
 
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("usersByRole")) || {};
@@ -135,34 +135,68 @@ export default function ManageUsers() {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    const form = e.currentTarget;
-    if (
-      form.checkValidity() === false ||
-      formData.password !== formData.confirmPassword
-    ) {
-      setFormValidated(true);
-      return;
-    }
-    const updatedUsers = editMode
-      ? users.map((u) => (u.userId === formData.userId ? formData : u))
-      : [...users, formData];
+  e.preventDefault();
+  const form = e.currentTarget;
 
-    updateLocalStorage(updatedUsers);
-    setUsers(updatedUsers);
-    setShowFormModal(false);
-    toast.success(`user added succesfully`, {
+  if (
+    form.checkValidity() === false ||
+    formData.password !== formData.confirmPassword
+  ) {
+    setFormValidated(true);
+    return;
+  }
+
+  // Get all users from localStorage
+  const localStorageUsersByRole = JSON.parse(
+    localStorage.getItem("usersByRole") || "{}"
+  );
+
+  // Flatten all users into one array
+  const allUsers = Object.values(localStorageUsersByRole).flat();
+
+  // Check for duplicate email + role
+  const isDuplicate = allUsers.some(
+    (u) =>
+      u.email.toLowerCase() === formData.email.toLowerCase() &&
+      u.role === formData.role &&
+      (!editMode || u.userId !== formData.userId)
+  );
+
+  if (isDuplicate) {
+    toast.error("A user with this email and role already exists.", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      theme: "colored",
+    });
+    return;
+  }
+
+  const updatedUsers = editMode
+    ? users.map((u) => (u.userId === formData.userId ? formData : u))
+    : [...users, formData];
+
+  updateLocalStorage(updatedUsers);
+  setUsers(updatedUsers);
+  setShowFormModal(false);
+
+  toast.success(
+    editMode ? "User updated successfully." : "User added successfully.",
+    {
       position: "top-right",
       autoClose: 2000,
       hideProgressBar: false,
       closeOnClick: false,
       pauseOnHover: true,
       draggable: true,
-      progress: undefined,
       theme: "colored",
-      // transition: Bounce,
-    });
-  };
+    }
+  );
+};
+
 
   const updateLocalStorage = (updated) => {
     const grouped = updated.reduce((acc, user) => {
@@ -175,7 +209,7 @@ export default function ManageUsers() {
 
   return (
     <div className="container mt-4 text-white animate__animated animate__fadeIn">
-      <ToastContainer theme="dark" />
+      {/* <ToastContainer theme="dark" /> */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <button className="btn btn-success" onClick={handleAddUser}>
           <Plus className="me-1" size={18} /> Add User
@@ -387,133 +421,137 @@ export default function ManageUsers() {
       </Modal>
 
       {/* Add/Edit Modal */}
-      <Modal
-        show={showFormModal}
-        onHide={() => setShowFormModal(false)}
-        centered
-        scrollable
-        enforceFocus={false} // ✅ Important fix
-        className="animate__animated animate__zoomIn"
-      >
-        <Modal.Header
-          closeButton
-          className="bg-dark text-white"
-          closeVariant="white"
+      {showFormModal && (
+        <Modal
+          show={showFormModal}
+          onHide={() => {
+            setShowFormModal(false);
+          }}
+          centered
+          scrollable
+          // enforceFocus={false}
+          className="animate__animated animate__zoomIn"
         >
-          <Modal.Title>{editMode ? "Edit User" : "Add User"}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="bg-dark text-white">
-          <Form noValidate validated={formValidated} onSubmit={handleSubmit}>
-            <Form.Group className="mb-3">
-              <Form.Label>Name</Form.Label>
-              <Form.Control
-                name="username"
-                value={formData.username}
-                onChange={handleFormChange}
-                placeholder="Enter name"
-                required
-                pattern="^[a-zA-Z ]{3,}$"
-              />
-              <Form.Control.Feedback type="invalid">
-                Name must be at least 3 letters and contain only alphabets.
-              </Form.Control.Feedback>
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Email</Form.Label>
-              <Form.Control
-                name="email"
-                value={formData.email}
-                onChange={handleFormChange}
-                type="email"
-                placeholder="Enter email"
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter a valid email address.
-              </Form.Control.Feedback>
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Password</Form.Label>
-              <Form.Control
-                name="password"
-                value={formData.password}
-                onChange={handleFormChange}
-                type="password"
-                placeholder="Enter password"
-                required
-                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}"
-              />
-              <Form.Control.Feedback type="invalid">
-                Password must be at least 6 characters and include uppercase,
-                lowercase, and a number.
-              </Form.Control.Feedback>
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Confirm Password</Form.Label>
-              <Form.Control
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleFormChange}
-                type="password"
-                placeholder="Confirm password"
-                required
-                isInvalid={formData.confirmPassword !== formData.password}
-              />
-              <Form.Control.Feedback type="invalid">
-                Passwords do not match.
-              </Form.Control.Feedback>
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-              <Form.Label>Role</Form.Label>
-              <Form.Select
-                name="role"
-                value={formData.role}
-                onChange={handleFormChange}
-                required
-              >
-                <option value="">Select Role</option>
-                <option value="admin">Admin</option>
-                <option value="faculty">Faculty</option>
-                <option value="librarian">Librarian</option>
-                <option value="student">Student</option>
-              </Form.Select>
-              <Form.Control.Feedback type="invalid">
-                Please select a role.
-              </Form.Control.Feedback>
-            </Form.Group>
-
-            {formData.role === "student" && (
+          <Modal.Header
+            closeButton
+            className="bg-dark text-white"
+            closeVariant="white"
+          >
+            <Modal.Title>{editMode ? "Edit User" : "Add User"}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body className="bg-dark text-white">
+            <Form noValidate validated={formValidated} onSubmit={handleSubmit}>
               <Form.Group className="mb-3">
-                <Form.Label>Department</Form.Label>
+                <Form.Label>Name</Form.Label>
+                <Form.Control
+                  name="username"
+                  value={formData.username}
+                  onChange={handleFormChange}
+                  placeholder="Enter name"
+                  required
+                  pattern="^[a-zA-Z ]{3,}$"
+                />
+                <Form.Control.Feedback type="invalid">
+                  Name must be at least 3 letters and contain only alphabets.
+                </Form.Control.Feedback>
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Email</Form.Label>
+                <Form.Control
+                  name="email"
+                  value={formData.email}
+                  onChange={handleFormChange}
+                  type="email"
+                  placeholder="Enter email"
+                  required
+                />
+                <Form.Control.Feedback type="invalid">
+                  Please enter a valid email address.
+                </Form.Control.Feedback>
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Password</Form.Label>
+                <Form.Control
+                  name="password"
+                  value={formData.password}
+                  onChange={handleFormChange}
+                  type="password"
+                  placeholder="Enter password"
+                  required
+                  pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}"
+                />
+                <Form.Control.Feedback type="invalid">
+                  Password must be at least 6 characters and include uppercase,
+                  lowercase, and a number.
+                </Form.Control.Feedback>
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Confirm Password</Form.Label>
+                <Form.Control
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleFormChange}
+                  type="password"
+                  placeholder="Confirm password"
+                  required
+                  isInvalid={formData.confirmPassword !== formData.password}
+                />
+                <Form.Control.Feedback type="invalid">
+                  Passwords do not match.
+                </Form.Control.Feedback>
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Role</Form.Label>
                 <Form.Select
-                  name="department"
-                  value={formData.department}
+                  name="role"
+                  value={formData.role}
                   onChange={handleFormChange}
                   required
                 >
-                  <option value="">Select Department</option>
-                  <option value="Computer Science">Computer Science</option>
-                  <option value="Electronics">Electronics</option>
-                  <option value="Mechanical">Mechanical</option>
-                  <option value="Civil">Civil</option>
-                  <option value="IT">Information Technology</option>
+                  <option value="">Select Role</option>
+                  <option value="admin">Admin</option>
+                  <option value="faculty">Faculty</option>
+                  <option value="librarian">Librarian</option>
+                  <option value="student">Student</option>
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">
-                  Please select a department.
+                  Please select a role.
                 </Form.Control.Feedback>
               </Form.Group>
-            )}
 
-            <Button variant="success" type="submit">
-              {editMode ? "Update" : "Add"} User
-            </Button>
-          </Form>
-        </Modal.Body>
-      </Modal>
+              {formData.role === "student" && (
+                <Form.Group className="mb-3">
+                  <Form.Label>Department</Form.Label>
+                  <Form.Select
+                    name="department"
+                    value={formData.department}
+                    onChange={handleFormChange}
+                    required
+                  >
+                    <option value="">Select Department</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Mechanical">Mechanical</option>
+                    <option value="Civil">Civil</option>
+                    <option value="IT">Information Technology</option>
+                  </Form.Select>
+                  <Form.Control.Feedback type="invalid">
+                    Please select a department.
+                  </Form.Control.Feedback>
+                </Form.Group>
+              )}
+
+              <Button variant="success" type="submit">
+                {editMode ? "Update" : "Add"} User
+              </Button>
+            </Form>
+          </Modal.Body>
+        </Modal>
+      )}
 
       {/* Delete Confirm Modal */}
       <Modal

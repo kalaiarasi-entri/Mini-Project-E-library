@@ -7,6 +7,8 @@ import {
   ChevronRight,
   Eye,
 } from "lucide-react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "animate.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
@@ -121,6 +123,17 @@ export default function ManageBooks() {
     }
     setBooks(updated);
     localStorage.setItem("books", JSON.stringify(updated));
+    toast.success(`book added succesfully`, {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          // transition: Bounce,
+        });
     closeModal();
   };
 
@@ -242,7 +255,11 @@ export default function ManageBooks() {
                   <td>{b.author}</td>
                   <td>
                     {b.fileURL ? (
-                      <a href={b.fileURL} target="_blank" rel="noreferrer">
+                      <a
+                        href="/assets/files/_E-library_system.pdf"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
                         View
                       </a>
                     ) : (
@@ -297,7 +314,9 @@ export default function ManageBooks() {
           <div className="modal-dialog modal-lg modal-dialog-centered">
             <div className="modal-content bg-dark text-white rounded-4 shadow-lg">
               <div className="modal-header border-secondary">
-                <h5 className="modal-title fw-semibold text-capitalize">📖 {viewBook.title}</h5>
+                <h5 className="modal-title fw-semibold text-capitalize">
+                  📖 {viewBook.title}
+                </h5>
                 <button
                   type="button"
                   className="btn-close btn-close-white"
@@ -478,7 +497,7 @@ export default function ManageBooks() {
                       required={!formData.fileURL}
                     />
                     {formData.fileName && (
-                      <small className="text-muted">
+                      <small className="text-white">
                         Uploaded: {formData.fileName}
                       </small>
                     )}
