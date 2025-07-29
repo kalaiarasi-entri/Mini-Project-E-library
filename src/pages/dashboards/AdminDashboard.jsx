@@ -226,7 +226,7 @@ export default function AdminDashboard() {
 
         {/* Student Count by Department */}
         <div className="col-md-6">
-          <div className="card bg-dark p-3 shadow animate__animated animate__fadeInRight">
+          <div className="card bg-dark p-3 shadow animate__animated animate__fadeInRight" style={{ minHeight: '360px' }}>
             <h5 className="text-center mb-3 text-white">
               Student Count by Department
             </h5>
@@ -247,7 +247,7 @@ export default function AdminDashboard() {
 
         {/* Most Borrowed Books */}
         <div className="col-md-6">
-          <div className="card bg-dark p-3 shadow animate__animated animate__fadeInUp">
+          <div className="card bg-dark p-3 shadow animate__animated animate__fadeInUp" style={{ minHeight: '350px' }}>
             <h5 className="text-center mb-3 text-white">Most Borrowed Books</h5>
             {topBooks.length > 0 ? (
               <ApexCharts
@@ -266,7 +266,7 @@ export default function AdminDashboard() {
 
         {/* Students Who Borrowed Most */}
         <div className="col-md-6">
-          <div className="card bg-dark p-3 shadow animate__animated animate__fadeInUp">
+          <div className="card bg-dark p-3 shadow animate__animated animate__fadeInUp" style={{ minHeight: '350px' }}>
             <h5 className="text-center mb-3 text-white">
               Top Borrowing Students
             </h5>
