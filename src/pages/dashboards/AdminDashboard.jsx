@@ -143,13 +143,13 @@ export default function AdminDashboard() {
       gradient: "linear-gradient(135deg, #f28e2b, #a95f17)",
       link: "/books",
     },
-    {
-      label: "Borrow Requests",
-      count: borrowData.length,
-      icon: <Archive size={30} className="text-white" />,
-      gradient: "linear-gradient(135deg, #e15759, #a13a3c)",
-      link: "/student-reports",
-    },
+    // {
+    //   label: "Borrow Requests",
+    //   count: borrowData.length,
+    //   icon: <Archive size={30} className="text-white" />,
+    //   gradient: "linear-gradient(135deg, #e15759, #a13a3c)",
+    //   link: "/student-reports",
+    // },
   ];
 
   return (
@@ -157,7 +157,7 @@ export default function AdminDashboard() {
       <div className="row g-4">
         <div className="row g-4 mb-4  animate__animated animate__fadeInRight">
           {dashboardCards.map((card, idx) => (
-            <div className="col-md-3" key={idx}>
+            <div className="col-md-4" key={idx}>
               <div
                 className="card text-white"
                 style={{
@@ -190,7 +190,7 @@ export default function AdminDashboard() {
                     >
                       {card.icon}
                     </div>
-                    <div className="fw-semibold text-uppercase small">
+                    <div className="fw-semibold text-uppercase text-center">
                       {card.label}
                     </div>
                   </div>

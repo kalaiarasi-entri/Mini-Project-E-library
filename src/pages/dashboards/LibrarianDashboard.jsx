@@ -152,7 +152,7 @@ export default function LibrarianDashboard() {
     },
     {
       label: "Requested",
-      count: JSON.parse(localStorage.getItem("borrowRequests") || "[]").length,
+      count:  borrowRequests.filter((r) => r.status === "Requested").length,
       icon: <Send size={30} className="text-white" />,
       gradient: "linear-gradient(135deg, #59a14f, #2d6b34)",
       link: "/borrow-requests",

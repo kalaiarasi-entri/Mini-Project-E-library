@@ -114,6 +114,7 @@ export default function AdminReports() {
       </div>
 
       {/* Flip Cards */}
+      { visibleUsers.length>0?(
       <div className="row g-4 mt-4">
         {visibleUsers.map((user, idx) => (
           <div key={idx} className="col-md-4 mb-4">
@@ -160,7 +161,7 @@ export default function AdminReports() {
             </div>
           </div>
         ))}
-      </div>
+      </div>):(<p className="text-white text-center mt-4">No Records Found</p>)}
 
       {/* Load More */}
       {visibleCount < sorted.length && (

@@ -243,7 +243,7 @@ export default function MyBooks() {
                     >
                       {hasRequested(b.bookId) ? (
                         <>
-                          <CheckCircle size={16} className="me-1" /> Requested
+                          <CheckCircle size={16} className="me-1" /> Request
                         </>
                       ) : (
                         <>

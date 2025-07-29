@@ -136,7 +136,7 @@ export default function StudentDashboard() {
       },
       {
         label: "Requested",
-        count:  borrowRequests.filter(req => req.studentId === user?.userId).length,
+        count:  borrowRequests.filter(req => req.status === "Requested").length,
         icon: <Send size={30} className="text-white" />,
         gradient: "linear-gradient(135deg, #59a14f, #2d6b34)",
         link: "/borrowed-books",
